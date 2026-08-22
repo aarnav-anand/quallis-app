@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quallis – Crop Intelligence by AgriFusion</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       SCREEN 1 — DIF CODE LOGIN
+  ════════════════════════════════════════════ -->
+  <div id="screen-login" class="screen active">
+    <div class="login-bg">
+      <div class="leaf-pattern"></div>
+    </div>
+    <div class="login-card">
+      <div class="logo-wrap">
+        <span class="logo-icon">🌾</span>
+        <div>
+          <h1 class="logo-title">Quallis</h1>
+          <p class="logo-sub" data-en="by AgriFusion" data-hi="AgriFusion द्वारा">by AgriFusion</p>
+        </div>
+      </div>
+
+      <div class="lang-toggle-wrap">
+        <button class="lang-pill active" data-lang="en">EN</button>
+        <button class="lang-pill" data-lang="hi">हिं</button>
+      </div>
+
+      <p class="login-instruction" data-en="Enter your 4-digit DIF code to continue" data-hi="जारी रखने के लिए अपना 4-अंकीय DIF कोड दर्ज करें">
+        Enter your 4-digit DIF code to continue
+      </p>
+
+      <div class="dif-input-row" id="dif-boxes">
+        <input class="dif-box" type="number" maxlength="1" min="0" max="9" inputmode="numeric" autocomplete="off" />
+        <input class="dif-box" type="number" maxlength="1" min="0" max="9" inputmode="numeric" autocomplete="off" />
+        <input class="dif-box" type="number" maxlength="1" min="0" max="9" inputmode="numeric" autocomplete="off" />
+        <input class="dif-box" type="number" maxlength="1" min="0" max="9" inputmode="numeric" autocomplete="off" />
+      </div>
+
+      <p class="error-msg hidden" id="login-error"></p>
+
+      <button class="btn-primary" id="btn-login">
+        <span data-en="Verify & Enter" data-hi="सत्यापित करें और प्रवेश करें">Verify & Enter</span>
+        <span class="btn-spinner hidden" id="login-spinner">⏳</span>
+      </button>
+
+      <p class="login-footer" data-en="Your DIF code is linked to your registered account" data-hi="आपका DIF कोड आपके पंजीकृत खाते से जुड़ा है">
+        Your DIF code is linked to your registered account
+      </p>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       SCREEN 2 — MAIN DASHBOARD
+  ════════════════════════════════════════════ -->
+  <div id="screen-main" class="screen hidden">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="logo-icon-sm">🌾</span>
+        <span class="topbar-name">Quallis</span>
+      </div>
+      <div class="topbar-right">
+        <div class="credits-badge" id="credits-badge">
+          <span class="credits-icon">✦</span>
+          <span id="credits-display">–</span>
+          <span class="credits-label" data-en="credits" data-hi="क्रेडिट">credits</span>
+        </div>
+        <div class="lang-toggle-wrap small">
+          <button class="lang-pill active" data-lang="en">EN</button>
+          <button class="lang-pill" data-lang="hi">हिं</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <div class="hero-eyebrow" data-en="AI-Powered" data-hi="AI-संचालित">AI-Powered</div>
+        <h2 class="hero-title" data-en="Smart Crop<br>Analysis" data-hi="स्मार्ट फसल<br>विश्लेषण">Smart Crop<br>Analysis</h2>
+        <p class="hero-desc" data-en="Upload a photo of your crop and receive expert-level disease detection and treatment advice instantly." data-hi="अपनी फसल की तस्वीर अपलोड करें और तुरंत विशेषज्ञ-स्तरीय रोग पहचान और उपचार सलाह प्राप्त करें।">
+          Upload a photo of your crop and receive expert-level disease detection and treatment advice instantly.
+        </p>
+      </div>
+      <div class="hero-art">
+        <div class="floating-leaf">🌿</div>
+        <div class="floating-leaf delay-1">🍃</div>
+        <div class="floating-leaf delay-2">🌱</div>
+      </div>
+    </section>
+
+    <!-- Credits exhausted notice (hidden by default) -->
+    <div class="credits-exhausted hidden" id="credits-exhausted-banner">
+      <span>⚠️</span>
+      <span class="credits-ex-text" data-en='Credits exhausted. Please purchase more scans from <a href="https://agrifusion-hub.vercel.app" target="_blank">agrifusion-hub.vercel.app</a>' data-hi='क्रेडिट समाप्त। कृपया <a href="https://agrifusion-hub.vercel.app" target="_blank">agrifusion-hub.vercel.app</a> से अधिक स्कैन खरीदें'>
+        Credits exhausted. Please purchase more scans from <a href="https://agrifusion-hub.vercel.app" target="_blank">agrifusion-hub.vercel.app</a>
+      </span>
+    </div>
+
+    <!-- Scan CTA -->
+    <div class="scan-cta-wrap">
+      <button class="btn-scan" id="btn-open-scan">
+        <span class="scan-icon">📷</span>
+        <span data-en="Start Scan Analysis" data-hi="स्कैन विश्लेषण शुरू करें">Start Scan Analysis</span>
+      </button>
+    </div>
+
+    <!-- Recent scans placeholder -->
+    <div class="history-section">
+      <h3 class="section-label" data-en="How it works" data-hi="यह कैसे काम करता है">How it works</h3>
+      <div class="steps-row">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <div class="step-text" data-en="Enter crop name & your Quallis code" data-hi="फसल का नाम और Quallis कोड दर्ज करें">Enter crop name & your Quallis code</div>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <div class="step-text" data-en="Upload a clear photo of the affected crop" data-hi="प्रभावित फसल की स्पष्ट तस्वीर अपलोड करें">Upload a clear photo of the affected crop</div>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <div class="step-text" data-en="Get AI-powered recommendations in Hindi & English" data-hi="हिंदी और अंग्रेजी में AI-संचालित अनुशंसाएं प्राप्त करें">Get AI-powered recommendations in Hindi & English</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       MODAL — SCAN WIZARD
+  ════════════════════════════════════════════ -->
+  <div class="modal-overlay hidden" id="modal-scan">
+    <div class="modal-card">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div>
+          <p class="modal-eyebrow" data-en="Scan Analysis" data-hi="स्कैन विश्लेषण">Scan Analysis</p>
+          <h3 class="modal-title" id="modal-step-title">Step 1 of 3</h3>
+        </div>
+        <button class="modal-close" id="btn-close-modal">✕</button>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:33%"></div>
+      </div>
+      <div class="progress-steps">
+        <span class="pstep active" id="ps1" data-en="Crop" data-hi="फसल">Crop</span>
+        <span class="pstep" id="ps2" data-en="Code" data-hi="कोड">Code</span>
+        <span class="pstep" id="ps3" data-en="Image" data-hi="छवि">Image</span>
+      </div>
+
+      <!-- Step 1: Crop Name -->
+      <div class="wizard-step active" id="step-1">
+        <label class="field-label" data-en="Crop Name" data-hi="फसल का नाम">Crop Name</label>
+        <input class="text-input" id="input-crop" type="text" placeholder="e.g. Wheat, Rice, Cotton…" autocomplete="off" />
+        <p class="field-hint" data-en="Enter the name of your crop in English or Hindi" data-hi="अपनी फसल का नाम अंग्रेजी या हिंदी में दर्ज करें">Enter the name of your crop in English or Hindi</p>
+      </div>
+
+      <!-- Step 2: Quallis Code -->
+      <div class="wizard-step hidden" id="step-2">
+        <label class="field-label" data-en="Quallis Code" data-hi="Quallis कोड">Quallis Code</label>
+        <input class="text-input" id="input-quallis-code" type="text" placeholder="Enter your Quallis code" autocomplete="off" />
+        <p class="field-hint" data-en="This encrypted code is unique to your account" data-hi="यह एन्क्रिप्टेड कोड आपके खाते के लिए अद्वितीय है">This encrypted code is unique to your account</p>
+        <div class="quallis-check-result hidden" id="quallis-result"></div>
+      </div>
+
+      <!-- Step 3: Image Upload -->
+      <div class="wizard-step hidden" id="step-3">
+        <label class="field-label" data-en="Crop Photo" data-hi="फसल की तस्वीर">Crop Photo</label>
+        <div class="upload-zone" id="upload-zone">
+          <input type="file" accept="image/*" id="input-image" class="file-input" />
+          <div class="upload-placeholder" id="upload-placeholder">
+            <span class="upload-icon">📸</span>
+            <span data-en="Tap to upload or capture" data-hi="अपलोड या कैप्चर करने के लिए टैप करें">Tap to upload or capture</span>
+          </div>
+          <img id="preview-img" class="preview-img hidden" alt="Crop preview" />
+        </div>
+        <p class="field-hint" data-en="Take a clear, well-lit photo of the affected area" data-hi="प्रभावित क्षेत्र की स्पष्ट, अच्छी तरह से रोशन तस्वीर लें">Take a clear, well-lit photo of the affected area</p>
+      </div>
+
+      <!-- Modal Error -->
+      <p class="error-msg hidden" id="modal-error"></p>
+
+      <!-- Modal Actions -->
+      <div class="modal-actions">
+        <button class="btn-ghost" id="btn-prev" disabled>
+          <span data-en="Back" data-hi="वापस">Back</span>
+        </button>
+        <button class="btn-primary" id="btn-next">
+          <span id="btn-next-label" data-en="Next" data-hi="अगला">Next</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       MODAL — RESULTS
+  ════════════════════════════════════════════ -->
+  <div class="modal-overlay hidden" id="modal-results">
+    <div class="modal-card results-card">
+
+      <div class="modal-header">
+        <div>
+          <p class="modal-eyebrow" data-en="Analysis Complete" data-hi="विश्लेषण पूर्ण">Analysis Complete</p>
+          <h3 class="modal-title" id="result-crop-label">–</h3>
+        </div>
+        <button class="modal-close" id="btn-close-results">✕</button>
+      </div>
+
+      <!-- Language Toggle for results -->
+      <div class="result-lang-row">
+        <button class="result-lang-btn active" id="rl-en" data-en="English" data-hi="अंग्रेजी">English</button>
+        <button class="result-lang-btn" id="rl-hi" data-en="Hindi" data-hi="हिंदी">हिंदी</button>
+      </div>
+
+      <!-- Analyzing spinner -->
+      <div class="analyzing-state" id="analyzing-state">
+        <div class="spinner-ring"></div>
+        <p data-en="Analyzing your crop…" data-hi="आपकी फसल का विश्लेषण हो रहा है…">Analyzing your crop…</p>
+      </div>
+
+      <!-- Results content -->
+      <div class="result-content hidden" id="result-content">
+        <div class="result-body" id="result-en"></div>
+        <div class="result-body hidden" id="result-hi"></div>
+      </div>
+
+      <button class="btn-primary result-done-btn hidden" id="btn-result-done">
+        <span data-en="Done" data-hi="हो गया">Done</span>
+      </button>
+
+    </div>
+  </div>
+
+
+  <script src="js/config.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/gemini.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
