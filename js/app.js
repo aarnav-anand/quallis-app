@@ -73,8 +73,8 @@
   // ── DIF Code input logic ───────────────────────
   difBoxes.forEach((box, idx) => {
     box.addEventListener("input", (e) => {
-      // Keep only last character (handles paste of >1 char)
-      const val = e.target.value.toString().replace(/\D/g, "").slice(-1);
+      // Keep only last alphanumeric character, force uppercase
+      const val = e.target.value.replace(/[^A-Za-z0-9]/g, "").slice(-1).toUpperCase();
       e.target.value = val;
       e.target.classList.toggle("filled", val !== "");
 
@@ -93,12 +93,13 @@
       if (e.key === "Enter") handleLogin();
     });
 
-    // Handle paste of 4 digits
+    // Handle paste of 4 alphanumeric characters
     box.addEventListener("paste", (e) => {
       e.preventDefault();
       const pasted = (e.clipboardData || window.clipboardData)
         .getData("text")
-        .replace(/\D/g, "")
+        .replace(/[^A-Za-z0-9]/g, "")
+        .toUpperCase()
         .slice(0, 4);
       pasted.split("").forEach((ch, i) => {
         if (difBoxes[i]) {

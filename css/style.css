@@ -183,8 +183,8 @@ a { color: var(--gold); }
   appearance: textfield;
   outline: none;
 }
-.dif-box::-webkit-outer-spin-button,
-.dif-box::-webkit-inner-spin-button { -webkit-appearance: none; }
+/* text-transform so typed lowercase appears uppercase instantly */
+.dif-box { text-transform: uppercase; }
 .dif-box:focus {
   border-color: var(--field);
   box-shadow: 0 0 0 3px rgba(61,122,58,0.25);
