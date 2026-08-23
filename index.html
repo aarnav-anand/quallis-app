@@ -248,6 +248,17 @@
   </div>
 
 
+  <script>
+    if (typeof CONFIG === "undefined") {
+      window.CONFIG = {
+        SUPABASE_URL: window.__env?.SUPABASE_URL || "",
+        SUPABASE_ANON_KEY: window.__env?.SUPABASE_ANON_KEY || "",
+        GEMINI_API_KEY: window.__env?.GEMINI_API_KEY || "",
+        GEMINI_MODEL: "gemini-1.5-flash",
+        TABLE_FARMERS: "farmers",
+      };
+    }
+  </script>
   <script src="js/config.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/supabase.js"></script>

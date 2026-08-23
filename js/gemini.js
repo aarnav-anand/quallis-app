@@ -16,6 +16,14 @@ const gemini = (() => {
    * @returns {{ en: string, hi: string }}
    */
   async function analyzeCrop(cropName, quallisCode, base64Image, mimeType) {
+    if (!CONFIG.GEMINI_API_KEY || CONFIG.GEMINI_API_KEY.includes("YOUR_GEMINI_API_KEY")) {
+      console.warn("Gemini API key missing in js/config.js. Returning simulated analysis.");
+      return {
+        en: `<h3>Analysis for ${cropName} (Demo Mode)</h3><p><strong>Status:</strong> Mild Rust detected</p><p><strong>Note:</strong> Set <code>GEMINI_API_KEY</code> in <code>js/config.js</code> for live AI analysis.</p><ul><li>Apply organic fungicide or neem oil solution.</li><li>Ensure proper field drainage and crop spacing.</li></ul>`,
+        hi: `<h3>${cropName} का विश्लेषण (डेमो मोड)</h3><p><strong>स्थिति:</strong> हल्का रस्ट (गैरूई) का लक्षण</p><p><strong>नोट:</strong> लाइव AI विश्लेषण के लिए <code>js/config.js</code> में <code>GEMINI_API_KEY</code> सेट करें।</p><ul><li>जैविक कवकनाशी या नीम के तेल के घोल का छिड़काव करें।</li><li>खेत में उचित जल निकासी और दूरी सुनिश्चित करें।</li></ul>`
+      };
+    }
+
     const prompt = buildPrompt(cropName, quallisCode);
 
     const payload = {

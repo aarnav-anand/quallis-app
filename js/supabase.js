@@ -18,11 +18,33 @@ const db = (() => {
     return `${CONFIG.SUPABASE_URL}/rest/v1/${table}${params}`;
   }
 
+  function isConfigured() {
+    return (
+      Boolean(CONFIG.SUPABASE_URL) &&
+      Boolean(CONFIG.SUPABASE_ANON_KEY) &&
+      !CONFIG.SUPABASE_URL.includes("YOUR_PROJECT_ID")
+    );
+  }
+
+  // Demo state for local testing when backend credentials are not set
+  let demoQuallis = 10;
+
   /**
    * Find a farmer by DIF code.
    * Returns the farmer row (object) or null if not found.
    */
   async function findByDifCode(code) {
+    if (!isConfigured()) {
+      console.warn("Supabase credentials not configured in js/config.js. Running in demo mode.");
+      return {
+        id: "demo-farmer-id",
+        farmer_name: "Demo Farmer",
+        quallis: demoQuallis,
+        dif_code: code.toUpperCase(),
+        role: "farmer",
+      };
+    }
+
     const encoded = encodeURIComponent(code.toUpperCase());
     const res = await fetch(
       url(CONFIG.TABLE_FARMERS, `?dif_code=eq.${encoded}&select=id,farmer_name,quallis,dif_code,role`),
@@ -38,6 +60,11 @@ const db = (() => {
    * Returns the updated row.
    */
   async function decrementQuallis(farmerId) {
+    if (!isConfigured()) {
+      demoQuallis = Math.max(0, demoQuallis - 1);
+      return { quallis: demoQuallis };
+    }
+
     // First fetch current value to avoid race conditions
     const res1 = await fetch(
       url(CONFIG.TABLE_FARMERS, `?id=eq.${farmerId}&select=quallis`),
@@ -63,6 +90,10 @@ const db = (() => {
    * Fetch latest quallis count for a given farmer id.
    */
   async function getQuallis(farmerId) {
+    if (!isConfigured()) {
+      return demoQuallis;
+    }
+
     const res = await fetch(
       url(CONFIG.TABLE_FARMERS, `?id=eq.${farmerId}&select=quallis`),
       { headers: headers() }

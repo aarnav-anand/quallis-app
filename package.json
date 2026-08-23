@@ -1,0 +1,8 @@
+{
+  "name": "quallis",
+  "version": "1.0.0",
+  "description": "Quallis - Crop Intelligence Platform",
+  "scripts": {
+    "build": "node generate-config.js"
+  }
+}
