@@ -15,7 +15,7 @@ const CONFIG = {
   SUPABASE_URL:      "${supabaseUrl}",
   SUPABASE_ANON_KEY: "${supabaseAnonKey}",
   GEMINI_API_KEY:    "${geminiApiKey}",
-  GEMINI_MODEL:      "gemini-2.5-flash",
+  GEMINI_MODEL:      "gemini-3.6-flash",
   TABLE_FARMERS:     "farmers",
 };
 Object.freeze(CONFIG);
