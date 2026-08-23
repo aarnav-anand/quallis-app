@@ -6,10 +6,10 @@
   // ── State ─────────────────────────────────────
   const state = {
     farmer: null,      // { id, farmer_name, quallis, dif_code }
-    quallis: 0,        // live credit count
+    quallis: 0,        // live scan credit count
     wizardStep: 1,     // 1 | 2 | 3
     cropName: "",
-    quallisCode: "",
+    sensorData: null,  // decoded sensor object { ethanol_ppm, methane_ppm, temperature_c, humidity_pct }
     imageBase64: "",
     imageMime: "",
   };
@@ -45,6 +45,7 @@
   const inputCrop = $("input-crop");
   const inputQuallisCode = $("input-quallis-code");
   const quallisResult = $("quallis-result");
+  const sensorCard = $("sensor-card");
   const uploadZone = $("upload-zone");
   const inputImage = $("input-image");
   const uploadPlaceholder = $("upload-placeholder");
@@ -179,11 +180,15 @@
 
   function openScanModal() {
     if (state.quallis <= 0) return;
+
+    // Reset state
     state.wizardStep = 1;
     state.cropName = "";
-    state.quallisCode = "";
+    state.sensorData = null;
     state.imageBase64 = "";
     state.imageMime = "";
+
+    // Reset inputs
     inputCrop.value = "";
     inputQuallisCode.value = "";
     inputImage.value = "";
@@ -191,8 +196,24 @@
     previewImg.classList.add("hidden");
     uploadPlaceholder.classList.remove("hidden");
     uploadZone.classList.remove("has-image");
+
+    // Reset step visibility — force step 1 active, others hidden
+    ["step-1", "step-2", "step-3"].forEach((id, i) => {
+      const el = $(id);
+      el.classList.toggle("active", i === 0);
+      el.classList.toggle("hidden", i !== 0);
+    });
+
+    // Reset progress step indicators
+    ["ps1", "ps2", "ps3"].forEach((id, i) => {
+      $( id).classList.toggle("active", i === 0);
+    });
+
+    // Hide sensor card and quallis result
+    if (sensorCard) sensorCard.classList.add("hidden");
     quallisResult.classList.add("hidden");
     clearError(modalError);
+
     modalScan.classList.remove("hidden");
     modalScan.classList.add("active");
     updateModalStepUI();
@@ -225,10 +246,23 @@
       goToStep(2);
 
     } else if (state.wizardStep === 2) {
-      const val = inputQuallisCode.value.trim();
-      if (!val) { showError(modalError, i18n.t("enterQuallis")); return; }
-      state.quallisCode = val;
-      goToStep(3);
+      const raw = inputQuallisCode.value.trim();
+      if (!raw) { showError(modalError, i18n.t("enterQuallis")); return; }
+
+      // Attempt to decode the hardware code
+      try {
+        const decoded = decoder.decodeQuallis(raw);
+        state.sensorData = decoded;
+        showSensorCard(decoded);
+        goToStep(3);
+      } catch (err) {
+        const msg = decoder.getErrorMessage(err, i18n.getLang());
+        showError(modalError, msg);
+        // Shake the input
+        inputQuallisCode.classList.add("input-error");
+        setTimeout(() => inputQuallisCode.classList.remove("input-error"), 600);
+        return;
+      }
 
     } else if (state.wizardStep === 3) {
       if (!state.imageBase64) { showError(modalError, i18n.t("chooseImage")); return; }
@@ -244,14 +278,14 @@
   }
 
   function goToStep(n) {
-    // Hide current
+    // Hide current step
     $(`step-${state.wizardStep}`).classList.remove("active");
     $(`step-${state.wizardStep}`).classList.add("hidden");
     $(`ps${state.wizardStep}`).classList.remove("active");
 
     state.wizardStep = n;
 
-    // Show new
+    // Show new step
     $(`step-${n}`).classList.remove("hidden");
     $(`step-${n}`).classList.add("active");
     $(`ps${n}`).classList.add("active");
@@ -281,6 +315,16 @@
     } else {
       btnNextLabel.textContent = i18n.t("next");
     }
+  }
+
+  // ── Sensor Card ───────────────────────────────
+  function showSensorCard(data) {
+    if (!sensorCard) return;
+    $("sc-ethanol").textContent = data.ethanol_ppm;
+    $("sc-methane").textContent = data.methane_ppm;
+    $("sc-temp").textContent = data.temperature_c;
+    $("sc-humidity").textContent = data.humidity_pct;
+    sensorCard.classList.remove("hidden");
   }
 
   // ── Image Upload ──────────────────────────────
@@ -348,7 +392,7 @@
     try {
       const { en, hi } = await gemini.analyzeCrop(
         state.cropName,
-        state.quallisCode,
+        state.sensorData,
         state.imageBase64,
         state.imageMime
       );

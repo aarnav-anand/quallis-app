@@ -20,23 +20,30 @@ const i18n = (() => {
       step3Title: "Step 3 of 3 — Upload Photo",
       next: "Next",
       back: "Back",
-      analyze: "Analyze",
+      analyze: "Analyze Quality",
       back2: "Back",
 
       // Validation
       enterCrop: "Please enter the crop name.",
-      enterQuallis: "Please enter your Quallis code.",
+      enterQuallis: "Please enter your Quallis hardware code.",
       chooseImage: "Please choose an image.",
-      invalidQuallis: "Quallis code not recognized. Please check and try again.",
+      invalidQuallis: "Invalid Quallis code. Please check and try again.",
+
+      // Sensor card
+      sensorDecoded: "Sensor Readings Decoded",
+      ethanol: "Ethanol",
+      methane: "Methane",
+      temperature: "Temperature",
+      humidity: "Humidity",
 
       // Results
-      analyzing: "Analyzing your crop…",
+      analyzing: "Analyzing post-harvest quality…",
       done: "Done",
 
       // Credits
-      creditsLabel: "credits",
-      creditsExhausted: 'Credits exhausted. Please purchase more scans from <a href="https://agrifusion-hub.vercel.app" target="_blank">agrifusion-hub.vercel.app</a>',
-      scanDisabled: "No credits remaining",
+      creditsLabel: "scans",
+      creditsExhausted: 'Scans exhausted. Please purchase more from <a href="https://agrifusion-hub.vercel.app" target="_blank">agrifusion-hub.vercel.app</a>',
+      scanDisabled: "No scans remaining",
     },
     hi: {
       // Login
@@ -51,23 +58,30 @@ const i18n = (() => {
       step3Title: "चरण 3 / 3 — तस्वीर अपलोड करें",
       next: "अगला",
       back: "वापस",
-      analyze: "विश्लेषण करें",
+      analyze: "गुणवत्ता जांचें",
       back2: "वापस",
 
       // Validation
       enterCrop: "कृपया फसल का नाम दर्ज करें।",
-      enterQuallis: "कृपया अपना Quallis कोड दर्ज करें।",
+      enterQuallis: "कृपया अपना Quallis हार्डवेयर कोड दर्ज करें।",
       chooseImage: "कृपया एक छवि चुनें।",
-      invalidQuallis: "Quallis कोड मान्यता नहीं मिली। कृपया जांचें और पुनः प्रयास करें।",
+      invalidQuallis: "अमान्य Quallis कोड। कृपया जांचें और पुनः प्रयास करें।",
+
+      // Sensor card
+      sensorDecoded: "सेंसर रीडिंग डिकोड हुई",
+      ethanol: "इथेनॉल",
+      methane: "मीथेन",
+      temperature: "तापमान",
+      humidity: "आर्द्रता",
 
       // Results
-      analyzing: "आपकी फसल का विश्लेषण हो रहा है…",
+      analyzing: "फसल की गुणवत्ता का विश्लेषण हो रहा है…",
       done: "हो गया",
 
       // Credits
-      creditsLabel: "क्रेडिट",
-      creditsExhausted: 'क्रेडिट समाप्त। कृपया <a href="https://agrifusion-hub.vercel.app" target="_blank">agrifusion-hub.vercel.app</a> से अधिक स्कैन खरीदें',
-      scanDisabled: "क्रेडिट समाप्त",
+      creditsLabel: "स्कैन",
+      creditsExhausted: 'स्कैन समाप्त। कृपया <a href="https://agrifusion-hub.vercel.app" target="_blank">agrifusion-hub.vercel.app</a> से अधिक खरीदें',
+      scanDisabled: "स्कैन समाप्त",
     },
   };
 
@@ -99,11 +113,11 @@ const i18n = (() => {
     // Update placeholders on inputs
     const cropInput = document.getElementById("input-crop");
     if (cropInput) {
-      cropInput.placeholder = current === "hi" ? "जैसे गेहूं, चावल, कपास…" : "e.g. Wheat, Rice, Cotton…";
+      cropInput.placeholder = current === "hi" ? "जैसे गेहूं, चावल, मक्का…" : "e.g. Wheat, Rice, Maize…";
     }
     const quallisInput = document.getElementById("input-quallis-code");
     if (quallisInput) {
-      quallisInput.placeholder = current === "hi" ? "अपना Quallis कोड दर्ज करें" : "Enter your Quallis code";
+      quallisInput.placeholder = current === "hi" ? "जैसे QLS-3A-K2-1F-G7-M4" : "e.g. QLS-3A-K2-1F-G7-M4";
     }
 
     // Sync lang-pill active state across all toggles

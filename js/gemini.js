@@ -1,30 +1,31 @@
 // ══════════════════════════════════════════════
 //  Quallis — Gemini Vision API
-//  Sends crop image + metadata and returns
-//  analysis in both English and Hindi.
+//  Sends post-harvest crop image + decoded sensor
+//  data and returns quality analysis in EN & HI.
 // ══════════════════════════════════════════════
 
 const gemini = (() => {
   const BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models";
 
   /**
-   * Analyse a crop image.
-   * @param {string} cropName    - e.g. "Wheat"
-   * @param {string} quallisCode - decrypted code string
-   * @param {string} base64Image - base64-encoded image data (without prefix)
-   * @param {string} mimeType    - e.g. "image/jpeg"
+   * Analyse a post-harvest crop image.
+   * @param {string} cropName       - e.g. "Wheat"
+   * @param {object} sensorData     - decoded sensor object from decoder.js
+   *   { ethanol_ppm, methane_ppm, temperature_c, humidity_pct }
+   * @param {string} base64Image    - base64-encoded image data (without prefix)
+   * @param {string} mimeType       - e.g. "image/jpeg"
    * @returns {{ en: string, hi: string }}
    */
-  async function analyzeCrop(cropName, quallisCode, base64Image, mimeType) {
+  async function analyzeCrop(cropName, sensorData, base64Image, mimeType) {
     if (!CONFIG.GEMINI_API_KEY || CONFIG.GEMINI_API_KEY.includes("YOUR_GEMINI_API_KEY")) {
       console.warn("Gemini API key missing in js/config.js. Returning simulated analysis.");
       return {
-        en: `<h3>Analysis for ${cropName} (Demo Mode)</h3><p><strong>Status:</strong> Mild Rust detected</p><p><strong>Note:</strong> Set <code>GEMINI_API_KEY</code> in <code>js/config.js</code> for live AI analysis.</p><ul><li>Apply organic fungicide or neem oil solution.</li><li>Ensure proper field drainage and crop spacing.</li></ul>`,
-        hi: `<h3>${cropName} का विश्लेषण (डेमो मोड)</h3><p><strong>स्थिति:</strong> हल्का रस्ट (गैरूई) का लक्षण</p><p><strong>नोट:</strong> लाइव AI विश्लेषण के लिए <code>js/config.js</code> में <code>GEMINI_API_KEY</code> सेट करें।</p><ul><li>जैविक कवकनाशी या नीम के तेल के घोल का छिड़काव करें।</li><li>खेत में उचित जल निकासी और दूरी सुनिश्चित करें।</li></ul>`
+        en: `<h3>Quality Report for ${cropName} (Demo Mode)</h3><p><strong>Overall Grade:</strong> B — Acceptable</p><p><strong>Note:</strong> Set <code>GEMINI_API_KEY</code> in <code>js/config.js</code> for live AI analysis.</p><ul><li>Ethanol levels within acceptable post-harvest range.</li><li>Store in a cool, dry location below 15°C to extend shelf life.</li></ul>`,
+        hi: `<h3>${cropName} की गुणवत्ता रिपोर्ट (डेमो मोड)</h3><p><strong>कुल ग्रेड:</strong> B — स्वीकार्य</p><p><strong>नोट:</strong> लाइव AI विश्लेषण के लिए <code>js/config.js</code> में <code>GEMINI_API_KEY</code> सेट करें।</p><ul><li>इथेनॉल स्तर स्वीकार्य सीमा में है।</li><li>शेल्फ लाइफ बढ़ाने के लिए 15°C से नीचे ठंडी, सूखी जगह पर रखें।</li></ul>`,
       };
     }
 
-    const prompt = buildPrompt(cropName, quallisCode);
+    const prompt = buildPrompt(cropName, sensorData);
 
     const payload = {
       contents: [
@@ -66,29 +67,41 @@ const gemini = (() => {
     return parseResponse(rawText);
   }
 
-  /** Build the structured prompt */
-  function buildPrompt(cropName, quallisCode) {
-    return `You are Quallis, an expert agricultural AI assistant serving farmers in India.
+  /** Build the structured post-harvest quality assessment prompt */
+  function buildPrompt(cropName, sensorData) {
+    const { ethanol_ppm, methane_ppm, temperature_c, humidity_pct } = sensorData;
 
-A farmer has submitted the following crop scan for analysis:
-- Crop: ${cropName}
-- Quallis Reference Code: ${quallisCode}
+    return `You are Quallis, an expert post-harvest crop quality AI assistant serving farmers and agri-businesses in India.
 
-Look carefully at the uploaded crop image. Provide a detailed analysis covering:
-1. **Crop Health Status** – Is the crop healthy, stressed, diseased, or pest-affected?
-2. **Diagnosis** – Identify any visible disease, deficiency, pest damage, or abiotic stress. Be specific.
-3. **Severity** – Rate severity (Mild / Moderate / Severe).
-4. **Recommended Actions** – Provide 3–5 specific, actionable treatment or prevention steps that an Indian farmer can realistically implement. Include organic and chemical options where applicable.
-5. **Preventive Measures** – Suggest 2–3 steps to prevent recurrence.
-6. **Best Time to Act** – When should the farmer take action?
+A farmer has submitted the following post-harvest crop sample for quality assessment:
+
+**Crop:** ${cropName}
+
+**Sensor Readings (from Quallis hardware box):**
+- Ethanol (MQ3): ${ethanol_ppm} ppm  — indicator of fermentation / spoilage onset
+- Methane (MQ4): ${methane_ppm} ppm  — indicator of anaerobic decomposition
+- Temperature:   ${temperature_c} °C — storage/ambient temperature at time of scan
+- Humidity:      ${humidity_pct} %   — relative humidity at time of scan
+
+**Uploaded Image:** (see attached crop photo)
+
+Based on the sensor data AND the visual appearance of the crop in the image, provide a comprehensive post-harvest quality report covering:
+
+1. **Overall Quality Grade** — Grade A (Excellent) / B (Good) / C (Acceptable) / D (Poor) / F (Reject). Justify clearly.
+2. **Visual Assessment** — Describe what you see: colour, texture, signs of mould, shrivelling, bruising, insect damage, moisture damage, or discolouration.
+3. **Sensor Interpretation** — Interpret the ethanol and methane readings in the context of this crop. Are they within safe limits? Do they indicate early fermentation, spoilage, or anaerobic rot?
+4. **Storage Suitability** — Is this batch suitable for short-term storage, long-term storage, or should it be sold/processed immediately?
+5. **Market Grading Advice** — What market grade (AGMARK or equivalent) does this batch likely qualify for? Should it be separated or blended?
+6. **Recommended Actions** — 3–5 specific, actionable steps the farmer should take immediately regarding storage, treatment, or sale.
+7. **Preventive Measures for Next Harvest** — 2–3 steps to improve post-harvest quality in the future.
 
 IMPORTANT: Structure your response EXACTLY as follows, with no extra text outside these sections:
 
 ===ENGLISH===
-[Your full English analysis here using markdown headers and bullet points]
+[Your full English quality report here using markdown headers and bullet points]
 
 ===HINDI===
-[Your full Hindi analysis here in Devanagari script using markdown headers and bullet points. Make sure all content is accurately translated and culturally appropriate for Indian farmers.]
+[Your full Hindi quality report here in Devanagari script using markdown headers and bullet points. Make sure all content is accurately translated and culturally appropriate for Indian farmers.]
 ===END===`;
   }
 

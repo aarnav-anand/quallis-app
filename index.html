@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quallis – Crop Intelligence by AgriFusion</title>
+  <title>Quallis – Post-Harvest Quality Intelligence by AgriFusion</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -46,7 +46,7 @@
       <p class="error-msg hidden" id="login-error"></p>
 
       <button class="btn-primary" id="btn-login">
-        <span data-en="Verify & Enter" data-hi="सत्यापित करें और प्रवेश करें">Verify & Enter</span>
+        <span data-en="Verify &amp; Enter" data-hi="सत्यापित करें और प्रवेश करें">Verify &amp; Enter</span>
         <span class="btn-spinner hidden" id="login-spinner">⏳</span>
       </button>
 
@@ -72,7 +72,7 @@
         <div class="credits-badge" id="credits-badge">
           <span class="credits-icon">✦</span>
           <span id="credits-display">–</span>
-          <span class="credits-label" data-en="credits" data-hi="क्रेडिट">credits</span>
+          <span class="credits-label" data-en="scans" data-hi="स्कैन">scans</span>
         </div>
         <div class="lang-toggle-wrap small">
           <button class="lang-pill active" data-lang="en">EN</button>
@@ -85,23 +85,23 @@
     <section class="hero-section">
       <div class="hero-content">
         <div class="hero-eyebrow" data-en="AI-Powered" data-hi="AI-संचालित">AI-Powered</div>
-        <h2 class="hero-title" data-en="Smart Crop<br>Analysis" data-hi="स्मार्ट फसल<br>विश्लेषण">Smart Crop<br>Analysis</h2>
-        <p class="hero-desc" data-en="Upload a photo of your crop and receive expert-level disease detection and treatment advice instantly." data-hi="अपनी फसल की तस्वीर अपलोड करें और तुरंत विशेषज्ञ-स्तरीय रोग पहचान और उपचार सलाह प्राप्त करें।">
-          Upload a photo of your crop and receive expert-level disease detection and treatment advice instantly.
+        <h2 class="hero-title" data-en="Post-Harvest<br>Quality Check" data-hi="कटाई के बाद<br>गुणवत्ता जांच">Post-Harvest<br>Quality Check</h2>
+        <p class="hero-desc" data-en="Scan your harvested crop with the Quallis box and get an instant AI-powered quality grade, storage advice, and market recommendation." data-hi="Quallis बॉक्स से अपनी कटी हुई फसल को स्कैन करें और तुरंत AI-आधारित गुणवत्ता ग्रेड, भंडारण सलाह और बाजार सुझाव प्राप्त करें।">
+          Scan your harvested crop with the Quallis box and get an instant AI-powered quality grade, storage advice, and market recommendation.
         </p>
       </div>
       <div class="hero-art">
-        <div class="floating-leaf">🌿</div>
-        <div class="floating-leaf delay-1">🍃</div>
-        <div class="floating-leaf delay-2">🌱</div>
+        <div class="floating-leaf">🌾</div>
+        <div class="floating-leaf delay-1">📦</div>
+        <div class="floating-leaf delay-2">✅</div>
       </div>
     </section>
 
     <!-- Credits exhausted notice (hidden by default) -->
     <div class="credits-exhausted hidden" id="credits-exhausted-banner">
       <span>⚠️</span>
-      <span class="credits-ex-text" data-en='Credits exhausted. Please purchase more scans from <a href="https://agrifusion-hub.vercel.app" target="_blank">agrifusion-hub.vercel.app</a>' data-hi='क्रेडिट समाप्त। कृपया <a href="https://agrifusion-hub.vercel.app" target="_blank">agrifusion-hub.vercel.app</a> से अधिक स्कैन खरीदें'>
-        Credits exhausted. Please purchase more scans from <a href="https://agrifusion-hub.vercel.app" target="_blank">agrifusion-hub.vercel.app</a>
+      <span class="credits-ex-text" data-en='Scans exhausted. Please purchase more from <a href="https://agrifusion-hub.vercel.app" target="_blank">agrifusion-hub.vercel.app</a>' data-hi='स्कैन समाप्त। कृपया <a href="https://agrifusion-hub.vercel.app" target="_blank">agrifusion-hub.vercel.app</a> से अधिक खरीदें'>
+        Scans exhausted. Please purchase more from <a href="https://agrifusion-hub.vercel.app" target="_blank">agrifusion-hub.vercel.app</a>
       </span>
     </div>
 
@@ -109,27 +109,27 @@
     <div class="scan-cta-wrap">
       <button class="btn-scan" id="btn-open-scan">
         <span class="scan-icon">📷</span>
-        <span data-en="Start Scan Analysis" data-hi="स्कैन विश्लेषण शुरू करें">Start Scan Analysis</span>
+        <span data-en="Start Quality Scan" data-hi="गुणवत्ता स्कैन शुरू करें">Start Quality Scan</span>
       </button>
     </div>
 
-    <!-- Recent scans placeholder -->
+    <!-- How it works -->
     <div class="history-section">
       <h3 class="section-label" data-en="How it works" data-hi="यह कैसे काम करता है">How it works</h3>
       <div class="steps-row">
         <div class="step-card">
           <div class="step-num">01</div>
-          <div class="step-text" data-en="Enter crop name & your Quallis code" data-hi="फसल का नाम और Quallis कोड दर्ज करें">Enter crop name & your Quallis code</div>
+          <div class="step-text" data-en="Scan your harvest with the Quallis hardware box" data-hi="Quallis हार्डवेयर बॉक्स से फसल स्कैन करें">Scan your harvest with the Quallis hardware box</div>
         </div>
         <div class="step-arrow">→</div>
         <div class="step-card">
           <div class="step-num">02</div>
-          <div class="step-text" data-en="Upload a clear photo of the affected crop" data-hi="प्रभावित फसल की स्पष्ट तस्वीर अपलोड करें">Upload a clear photo of the affected crop</div>
+          <div class="step-text" data-en="Enter the code shown on the LCD display" data-hi="LCD पर दिखा कोड दर्ज करें">Enter the code shown on the LCD display</div>
         </div>
         <div class="step-arrow">→</div>
         <div class="step-card">
           <div class="step-num">03</div>
-          <div class="step-text" data-en="Get AI-powered recommendations in Hindi & English" data-hi="हिंदी और अंग्रेजी में AI-संचालित अनुशंसाएं प्राप्त करें">Get AI-powered recommendations in Hindi & English</div>
+          <div class="step-text" data-en="Get AI quality grade &amp; storage advice instantly" data-hi="तुरंत AI गुणवत्ता ग्रेड और भंडारण सलाह पाएं">Get AI quality grade &amp; storage advice instantly</div>
         </div>
       </div>
     </div>
@@ -146,7 +146,7 @@
       <!-- Modal Header -->
       <div class="modal-header">
         <div>
-          <p class="modal-eyebrow" data-en="Scan Analysis" data-hi="स्कैन विश्लेषण">Scan Analysis</p>
+          <p class="modal-eyebrow" data-en="Quality Scan" data-hi="गुणवत्ता स्कैन">Quality Scan</p>
           <h3 class="modal-title" id="modal-step-title">Step 1 of 3</h3>
         </div>
         <button class="modal-close" id="btn-close-modal">✕</button>
@@ -159,22 +159,45 @@
       <div class="progress-steps">
         <span class="pstep active" id="ps1" data-en="Crop" data-hi="फसल">Crop</span>
         <span class="pstep" id="ps2" data-en="Code" data-hi="कोड">Code</span>
-        <span class="pstep" id="ps3" data-en="Image" data-hi="छवि">Image</span>
+        <span class="pstep" id="ps3" data-en="Photo" data-hi="फोटो">Photo</span>
       </div>
 
       <!-- Step 1: Crop Name -->
       <div class="wizard-step active" id="step-1">
         <label class="field-label" data-en="Crop Name" data-hi="फसल का नाम">Crop Name</label>
-        <input class="text-input" id="input-crop" type="text" placeholder="e.g. Wheat, Rice, Cotton…" autocomplete="off" />
-        <p class="field-hint" data-en="Enter the name of your crop in English or Hindi" data-hi="अपनी फसल का नाम अंग्रेजी या हिंदी में दर्ज करें">Enter the name of your crop in English or Hindi</p>
+        <input class="text-input" id="input-crop" type="text" placeholder="e.g. Wheat, Rice, Maize…" autocomplete="off" />
+        <p class="field-hint" data-en="Enter the name of your harvested crop" data-hi="अपनी कटी हुई फसल का नाम दर्ज करें">Enter the name of your harvested crop</p>
       </div>
 
-      <!-- Step 2: Quallis Code -->
+      <!-- Step 2: Quallis Hardware Code -->
       <div class="wizard-step hidden" id="step-2">
-        <label class="field-label" data-en="Quallis Code" data-hi="Quallis कोड">Quallis Code</label>
-        <input class="text-input" id="input-quallis-code" type="text" placeholder="Enter your Quallis code" autocomplete="off" />
-        <p class="field-hint" data-en="This encrypted code is unique to your account" data-hi="यह एन्क्रिप्टेड कोड आपके खाते के लिए अद्वितीय है">This encrypted code is unique to your account</p>
+        <label class="field-label" data-en="Quallis Hardware Code" data-hi="Quallis हार्डवेयर कोड">Quallis Hardware Code</label>
+        <input class="text-input" id="input-quallis-code" type="text" placeholder="e.g. QLS-3A-K2-1F-G7-M4" autocomplete="off" autocapitalize="characters" spellcheck="false" />
+        <p class="field-hint" data-en="Enter the 16-character code shown on your Quallis box LCD (format: QLS-XX-YY-TT-HH-CC)" data-hi="अपने Quallis बॉक्स की LCD पर दिखा 16-अक्षर कोड दर्ज करें (प्रारूप: QLS-XX-YY-TT-HH-CC)">Enter the 16-character code shown on your Quallis box LCD (format: QLS-XX-YY-TT-HH-CC)</p>
         <div class="quallis-check-result hidden" id="quallis-result"></div>
+
+        <!-- Sensor decode card (shown on successful decode) -->
+        <div class="sensor-card hidden" id="sensor-card">
+          <div class="sensor-card-title" data-en="Sensor Readings Decoded ✓" data-hi="सेंसर रीडिंग डिकोड हुई ✓">Sensor Readings Decoded ✓</div>
+          <div class="sensor-grid">
+            <div class="sensor-item">
+              <div class="sensor-label" data-en="Ethanol (MQ3)" data-hi="इथेनॉल (MQ3)">Ethanol (MQ3)</div>
+              <div class="sensor-value"><span id="sc-ethanol">–</span><span class="sensor-unit">ppm</span></div>
+            </div>
+            <div class="sensor-item">
+              <div class="sensor-label" data-en="Methane (MQ4)" data-hi="मीथेन (MQ4)">Methane (MQ4)</div>
+              <div class="sensor-value"><span id="sc-methane">–</span><span class="sensor-unit">ppm</span></div>
+            </div>
+            <div class="sensor-item">
+              <div class="sensor-label" data-en="Temperature" data-hi="तापमान">Temperature</div>
+              <div class="sensor-value"><span id="sc-temp">–</span><span class="sensor-unit">°C</span></div>
+            </div>
+            <div class="sensor-item">
+              <div class="sensor-label" data-en="Humidity" data-hi="आर्द्रता">Humidity</div>
+              <div class="sensor-value"><span id="sc-humidity">–</span><span class="sensor-unit">%</span></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Step 3: Image Upload -->
@@ -188,7 +211,7 @@
           </div>
           <img id="preview-img" class="preview-img hidden" alt="Crop preview" />
         </div>
-        <p class="field-hint" data-en="Take a clear, well-lit photo of the affected area" data-hi="प्रभावित क्षेत्र की स्पष्ट, अच्छी तरह से रोशन तस्वीर लें">Take a clear, well-lit photo of the affected area</p>
+        <p class="field-hint" data-en="Take a clear photo of your harvested crop sample" data-hi="अपने कटे हुए फसल के नमूने की स्पष्ट तस्वीर लें">Take a clear photo of your harvested crop sample</p>
       </div>
 
       <!-- Modal Error -->
@@ -216,7 +239,7 @@
 
       <div class="modal-header">
         <div>
-          <p class="modal-eyebrow" data-en="Analysis Complete" data-hi="विश्लेषण पूर्ण">Analysis Complete</p>
+          <p class="modal-eyebrow" data-en="Quality Report" data-hi="गुणवत्ता रिपोर्ट">Quality Report</p>
           <h3 class="modal-title" id="result-crop-label">–</h3>
         </div>
         <button class="modal-close" id="btn-close-results">✕</button>
@@ -231,7 +254,7 @@
       <!-- Analyzing spinner -->
       <div class="analyzing-state" id="analyzing-state">
         <div class="spinner-ring"></div>
-        <p data-en="Analyzing your crop…" data-hi="आपकी फसल का विश्लेषण हो रहा है…">Analyzing your crop…</p>
+        <p data-en="Analyzing post-harvest quality…" data-hi="कटाई के बाद की गुणवत्ता का विश्लेषण हो रहा है…">Analyzing post-harvest quality…</p>
       </div>
 
       <!-- Results content -->
@@ -254,13 +277,14 @@
         SUPABASE_URL: window.__env?.SUPABASE_URL || "",
         SUPABASE_ANON_KEY: window.__env?.SUPABASE_ANON_KEY || "",
         GEMINI_API_KEY: window.__env?.GEMINI_API_KEY || "",
-        GEMINI_MODEL: "gemini-1.5-flash",
+        GEMINI_MODEL: "gemini-2.0-flash-exp",
         TABLE_FARMERS: "farmers",
       };
     }
   </script>
   <script src="js/config.js"></script>
   <script src="js/i18n.js"></script>
+  <script src="js/decoder.js"></script>
   <script src="js/supabase.js"></script>
   <script src="js/gemini.js"></script>
   <script src="js/app.js"></script>
