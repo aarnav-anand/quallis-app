@@ -373,11 +373,13 @@
   // ── Run Analysis ──────────────────────────────
   async function runAnalysis() {
     try {
-      const { en, hi } = await gemini.analyzeCrop(
+      const currentLang = i18n.getLang();
+      const { html } = await gemini.analyzeCrop(
         state.cropName,
         state.sensorData,
         state.imageBase64,
-        state.imageMime
+        state.imageMime,
+        currentLang
       );
 
       // Decrement credit AFTER successful analysis
@@ -391,9 +393,8 @@
       }
       updateCreditsUI();
 
-      const currentLang = i18n.getLang();
       if (resultBody) {
-        resultBody.innerHTML = currentLang === "hi" ? hi : en;
+        resultBody.innerHTML = html;
       }
       analyzingState.classList.add("hidden");
       resultContent.classList.remove("hidden");

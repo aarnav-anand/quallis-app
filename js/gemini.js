@@ -1,7 +1,7 @@
 // ══════════════════════════════════════════════
 //  Quallis — Gemini Vision API
 //  Sends post-harvest crop image + decoded sensor
-//  data and returns quality analysis in EN & HI.
+//  data and returns quality analysis in the requested language.
 // ══════════════════════════════════════════════
 
 const gemini = (() => {
@@ -14,18 +14,19 @@ const gemini = (() => {
    *   { ethanol_ppm, methane_ppm, temperature_c, humidity_pct }
    * @param {string} base64Image    - base64-encoded image data (without prefix)
    * @param {string} mimeType       - e.g. "image/jpeg"
-   * @returns {{ en: string, hi: string }}
+   * @param {string} lang           - "en" | "hi"
+   * @returns {{ html: string }}
    */
-  async function analyzeCrop(cropName, sensorData, base64Image, mimeType) {
+  async function analyzeCrop(cropName, sensorData, base64Image, mimeType, lang = "en") {
     if (!CONFIG.GEMINI_API_KEY || CONFIG.GEMINI_API_KEY.includes("YOUR_GEMINI_API_KEY")) {
       console.warn("Gemini API key missing in js/config.js. Returning simulated analysis.");
-      return {
-        en: `<h3>Quality Report for ${cropName} (Demo Mode)</h3><p><strong>Overall Grade:</strong> B — Acceptable</p><p><strong>Note:</strong> Set <code>GEMINI_API_KEY</code> in <code>js/config.js</code> for live AI analysis.</p><ul><li>Ethanol levels within acceptable post-harvest range.</li><li>Store in a cool, dry location below 15°C to extend shelf life.</li></ul>`,
-        hi: `<h3>${cropName} की गुणवत्ता रिपोर्ट (डेमो मोड)</h3><p><strong>कुल ग्रेड:</strong> B — स्वीकार्य</p><p><strong>नोट:</strong> लाइव AI विश्लेषण के लिए <code>js/config.js</code> में <code>GEMINI_API_KEY</code> सेट करें।</p><ul><li>इथेनॉल स्तर स्वीकार्य सीमा में है।</li><li>शेल्फ लाइफ बढ़ाने के लिए 15°C से नीचे ठंडी, सूखी जगह पर रखें।</li></ul>`,
-      };
+      const demoHtml = lang === "hi"
+        ? `<h3>${cropName} की गुणवत्ता रिपोर्ट (डेमो मोड)</h3><p><strong>कुल ग्रेड:</strong> B — स्वीकार्य</p><p><strong>नोट:</strong> लाइव AI विश्लेषण के लिए <code>js/config.js</code> में <code>GEMINI_API_KEY</code> सेट करें।</p><ul><li>इथेनॉल स्तर स्वीकार्य सीमा में है।</li><li>शेल्फ लाइफ बढ़ाने के लिए 15°C से नीचे ठंडी, सूखी जगह पर रखें।</li></ul>`
+        : `<h3>Quality Report for ${cropName} (Demo Mode)</h3><p><strong>Overall Grade:</strong> B — Acceptable</p><p><strong>Note:</strong> Set <code>GEMINI_API_KEY</code> in <code>js/config.js</code> for live AI analysis.</p><ul><li>Ethanol levels within acceptable post-harvest range.</li><li>Store in a cool, dry location below 15°C to extend shelf life.</li></ul>`;
+      return { html: demoHtml };
     }
 
-    const prompt = buildPrompt(cropName, sensorData);
+    const prompt = buildPrompt(cropName, sensorData, lang);
 
     const payload = {
       contents: [
@@ -64,14 +65,21 @@ const gemini = (() => {
     const data = await res.json();
     const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
-    return parseResponse(rawText);
+    return { html: markdownToHtml(rawText) };
   }
 
-  /** Build the structured post-harvest quality assessment prompt */
-  function buildPrompt(cropName, sensorData) {
+  /** Build the structured post-harvest quality assessment prompt in the target language */
+  function buildPrompt(cropName, sensorData, lang) {
     const { ethanol_ppm, methane_ppm, temperature_c, humidity_pct } = sensorData;
+    const isHindi = lang === "hi";
+
+    const langInstruction = isHindi
+      ? "CRITICAL REQUIREMENT: You MUST write your ENTIRE response in HINDI using Devanagari script (देवनागरी). All section titles, descriptions, recommendations, and analysis must be in clear, culturally appropriate Hindi for Indian farmers."
+      : "CRITICAL REQUIREMENT: You MUST write your ENTIRE response in ENGLISH.";
 
     return `You are Quallis, an expert post-harvest crop quality AI assistant serving farmers and agri-businesses in India.
+
+${langInstruction}
 
 A farmer has submitted the following post-harvest crop sample for quality assessment:
 
@@ -95,36 +103,7 @@ Based on the sensor data AND the visual appearance of the crop in the image, pro
 6. **Recommended Actions** — 3–5 specific, actionable steps the farmer should take immediately regarding storage, treatment, or sale.
 7. **Preventive Measures for Next Harvest** — 2–3 steps to improve post-harvest quality in the future.
 
-IMPORTANT: Structure your response EXACTLY as follows, with no extra text outside these sections:
-
-===ENGLISH===
-[Your full English quality report here using markdown headers and bullet points]
-
-===HINDI===
-[Your full Hindi quality report here in Devanagari script using markdown headers and bullet points. Make sure all content is accurately translated and culturally appropriate for Indian farmers.]
-===END===`;
-  }
-
-  /** Parse "===ENGLISH===...===HINDI===...===END===" format */
-  function parseResponse(raw) {
-    const enMatch = raw.match(/===ENGLISH===\s*([\s\S]*?)(?:===HINDI===|===END===|$)/i);
-    const hiMatch = raw.match(/===HINDI===\s*([\s\S]*?)(?:===END===|$)/i);
-
-    let enText = enMatch ? enMatch[1].trim() : raw;
-    let hiText = hiMatch ? hiMatch[1].trim() : "";
-
-    // Clean up trailing ===END=== if captured
-    enText = enText.replace(/===END===$/i, "").trim();
-    hiText = hiText.replace(/===END===$/i, "").trim();
-
-    if (!hiText) {
-      hiText = enText;
-    }
-
-    return {
-      en: markdownToHtml(enText),
-      hi: markdownToHtml(hiText),
-    };
+Ensure all markdown headers and bullet points are cleanly formatted in the requested language (${isHindi ? "Hindi" : "English"}).`;
   }
 
   /** Minimal markdown → HTML converter */
