@@ -107,15 +107,23 @@ IMPORTANT: Structure your response EXACTLY as follows, with no extra text outsid
 
   /** Parse "===ENGLISH===...===HINDI===...===END===" format */
   function parseResponse(raw) {
-    const enMatch = raw.match(/===ENGLISH===\s*([\s\S]*?)===HINDI===/);
-    const hiMatch = raw.match(/===HINDI===\s*([\s\S]*?)===END===/);
+    const enMatch = raw.match(/===ENGLISH===\s*([\s\S]*?)(?:===HINDI===|===END===|$)/i);
+    const hiMatch = raw.match(/===HINDI===\s*([\s\S]*?)(?:===END===|$)/i);
 
-    const en = enMatch ? enMatch[1].trim() : raw;
-    const hi = hiMatch ? hiMatch[1].trim() : "विश्लेषण उपलब्ध नहीं है।";
+    let enText = enMatch ? enMatch[1].trim() : raw;
+    let hiText = hiMatch ? hiMatch[1].trim() : "";
+
+    // Clean up trailing ===END=== if captured
+    enText = enText.replace(/===END===$/i, "").trim();
+    hiText = hiText.replace(/===END===$/i, "").trim();
+
+    if (!hiText) {
+      hiText = enText;
+    }
 
     return {
-      en: markdownToHtml(en),
-      hi: markdownToHtml(hi),
+      en: markdownToHtml(enText),
+      hi: markdownToHtml(hiText),
     };
   }
 

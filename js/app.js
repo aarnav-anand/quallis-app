@@ -56,12 +56,9 @@
   const btnCloseResults = $("btn-close-results");
   const analyzingState = $("analyzing-state");
   const resultContent = $("result-content");
-  const resultEnDiv = $("result-en");
-  const resultHiDiv = $("result-hi");
+  const resultBody = $("result-body");
   const resultCropLabel = $("result-crop-label");
   const btnResultDone = $("btn-result-done");
-  const rlEn = $("rl-en");
-  const rlHi = $("rl-hi");
 
   // ── Language ──────────────────────────────────
   document.querySelectorAll(".lang-pill").forEach((btn) => {
@@ -358,28 +355,14 @@
     if (e.target === modalResults) closeResultsModal();
   });
 
-  // Result language toggle
-  rlEn.addEventListener("click", () => switchResultLang("en"));
-  rlHi.addEventListener("click", () => switchResultLang("hi"));
-
-  function switchResultLang(lang) {
-    rlEn.classList.toggle("active", lang === "en");
-    rlHi.classList.toggle("active", lang === "hi");
-    resultEnDiv.classList.toggle("hidden", lang !== "en");
-    resultHiDiv.classList.toggle("hidden", lang !== "hi");
-  }
-
   function openResultsModal() {
     resultCropLabel.textContent = state.cropName;
     analyzingState.classList.remove("hidden");
     resultContent.classList.add("hidden");
     btnResultDone.classList.add("hidden");
-    resultEnDiv.innerHTML = "";
-    resultHiDiv.innerHTML = "";
+    if (resultBody) resultBody.innerHTML = "";
     modalResults.classList.remove("hidden");
     modalResults.classList.add("active");
-    // Default result lang to app lang
-    switchResultLang(i18n.getLang());
   }
 
   function closeResultsModal() {
@@ -408,17 +391,21 @@
       }
       updateCreditsUI();
 
-      resultEnDiv.innerHTML = en;
-      resultHiDiv.innerHTML = hi;
+      const currentLang = i18n.getLang();
+      if (resultBody) {
+        resultBody.innerHTML = currentLang === "hi" ? hi : en;
+      }
       analyzingState.classList.add("hidden");
       resultContent.classList.remove("hidden");
       btnResultDone.classList.remove("hidden");
 
     } catch (err) {
       console.error("Analysis failed:", err);
-      const errMsg = `<p style="color:var(--error)">⚠️ Analysis failed: ${err.message}<br>Please try again.</p>`;
-      resultEnDiv.innerHTML = errMsg;
-      resultHiDiv.innerHTML = `<p style="color:var(--error)">⚠️ विश्लेषण विफल: ${err.message}<br>कृपया पुनः प्रयास करें।</p>`;
+      const currentLang = i18n.getLang();
+      const errMsg = currentLang === "hi"
+        ? `<p style="color:var(--error)">⚠️ विश्लेषण विफल: ${err.message}<br>कृपया पुनः प्रयास करें।</p>`
+        : `<p style="color:var(--error)">⚠️ Analysis failed: ${err.message}<br>Please try again.</p>`;
+      if (resultBody) resultBody.innerHTML = errMsg;
       analyzingState.classList.add("hidden");
       resultContent.classList.remove("hidden");
       btnResultDone.classList.remove("hidden");
