@@ -44,7 +44,7 @@ const gemini = (() => {
       ],
       generationConfig: {
         temperature: 0.4,
-        maxOutputTokens: 2048,
+        maxOutputTokens: 8192,
       },
     };
 
@@ -63,9 +63,19 @@ const gemini = (() => {
     }
 
     const data = await res.json();
-    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    const candidate = data?.candidates?.[0];
+    const rawText = (candidate?.content?.parts ?? [])
+      .map((p) => p.text ?? "")
+      .join("");
 
-    return { html: markdownToHtml(rawText) };
+    let html = markdownToHtml(rawText);
+    if (candidate?.finishReason === "MAX_TOKENS") {
+      html += lang === "hi"
+        ? `<p class="truncation-note">⚠️ रिपोर्ट लंबी होने के कारण यहीं रोक दी गई है। कृपया दोबारा स्कैन करें।</p>`
+        : `<p class="truncation-note">⚠️ The report was cut short because it exceeded the response limit. Please run the scan again.</p>`;
+    }
+
+    return { html };
   }
 
   /** Build the structured post-harvest quality assessment prompt in the target language */
@@ -103,36 +113,110 @@ Based on the sensor data AND the visual appearance of the crop in the image, pro
 6. **Recommended Actions** — 3–5 specific, actionable steps the farmer should take immediately regarding storage, treatment, or sale.
 7. **Preventive Measures for Next Harvest** — 2–3 steps to improve post-harvest quality in the future.
 
-Ensure all markdown headers and bullet points are cleanly formatted in the requested language (${isHindi ? "Hindi" : "English"}).`;
+Ensure all markdown headers and bullet points are cleanly formatted in the requested language (${isHindi ? "Hindi" : "English"}).
+
+FORMAT RULES:
+- Use "## " for each section heading and "- " for bullet points. Put every bullet on its own line.
+- Keep each section to at most 4 short bullets or 3 short sentences.
+- Keep the complete report under 550 words so it is never cut off, and always finish the final section.`;
   }
 
-  /** Minimal markdown → HTML converter */
-  function markdownToHtml(md) {
-    return md
-      // Headers
-      .replace(/^#### (.+)$/gm, "<h4>$1</h4>")
-      .replace(/^### (.+)$/gm, "<h3>$1</h3>")
-      .replace(/^## (.+)$/gm, "<h2>$1</h2>")
-      .replace(/^# (.+)$/gm, "<h2>$1</h2>")
-      // Bold
+  /** Escape HTML so model output can never inject markup */
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  /** Inline markdown (bold, italic, code) → HTML */
+  function inlineMarkdown(text) {
+    return escapeHtml(text)
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-      // Italic
-      .replace(/\*(.+?)\*/g, "<em>$1</em>")
-      // Bullet list items
-      .replace(/^[-•] (.+)$/gm, "<li>$1</li>")
-      // Numbered list items
-      .replace(/^\d+\. (.+)$/gm, "<li>$1</li>")
-      // Wrap consecutive <li> in <ul>
-      .replace(/(<li>[\s\S]*?<\/li>)(\s*(?!<li>))/g, "<ul>$1</ul>$2")
-      // Paragraphs (double newline → <p>)
-      .replace(/\n{2,}/g, "</p><p>")
-      .replace(/^(.+)$/, "<p>$1</p>")
-      // Fix doubled paragraph wrapping around block elements
-      .replace(/<p>(<[hul])/g, "$1")
-      .replace(/(<\/[hul][^>]*>)<\/p>/g, "$1")
-      // Clean up extra whitespace-only paragraphs
-      .replace(/<p>\s*<\/p>/g, "")
-      .trim();
+      .replace(/(^|[^*])\*([^*\n]+?)\*(?!\*)/g, "$1<em>$2</em>")
+      .replace(/`([^`]+?)`/g, "<code>$1</code>");
+  }
+
+  /**
+   * Minimal markdown → HTML converter.
+   * Line-based so that list markers (-, *, •, 1.) are never mistaken for
+   * inline emphasis and every bullet ends up on its own line.
+   */
+  function markdownToHtml(md) {
+    const lines = md.replace(/\r\n/g, "\n").split("\n");
+    const out = [];
+    let listType = null;   // "ul" | "ol" | null
+    let paragraph = [];
+
+    const closeParagraph = () => {
+      if (paragraph.length) {
+        out.push(`<p>${inlineMarkdown(paragraph.join(" "))}</p>`);
+        paragraph = [];
+      }
+    };
+    const closeList = () => {
+      if (listType) {
+        out.push(`</${listType}>`);
+        listType = null;
+      }
+    };
+    const openList = (type) => {
+      if (listType !== type) {
+        closeList();
+        out.push(`<${type}>`);
+        listType = type;
+      }
+    };
+
+    for (const rawLine of lines) {
+      const line = rawLine.trim();
+
+      if (!line) {
+        closeParagraph();
+        closeList();
+        continue;
+      }
+
+      const heading = line.match(/^(#{1,4})\s+(.+)$/);
+      if (heading) {
+        closeParagraph();
+        closeList();
+        const level = Math.min(Math.max(heading[1].length, 2), 4);
+        out.push(`<h${level}>${inlineMarkdown(heading[2].replace(/[*#]+$/, "").trim())}</h${level}>`);
+        continue;
+      }
+
+      if (/^(-{3,}|\*{3,}|_{3,})$/.test(line)) {
+        closeParagraph();
+        closeList();
+        out.push("<hr />");
+        continue;
+      }
+
+      const bullet = line.match(/^[-*•]\s+(.+)$/);
+      if (bullet) {
+        closeParagraph();
+        openList("ul");
+        out.push(`<li>${inlineMarkdown(bullet[1])}</li>`);
+        continue;
+      }
+
+      const numbered = line.match(/^\d+[.)]\s+(.+)$/);
+      if (numbered) {
+        closeParagraph();
+        openList("ol");
+        out.push(`<li>${inlineMarkdown(numbered[1])}</li>`);
+        continue;
+      }
+
+      closeList();
+      paragraph.push(line);
+    }
+
+    closeParagraph();
+    closeList();
+
+    return out.join("").trim();
   }
 
   return { analyzeCrop };

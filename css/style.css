@@ -30,6 +30,7 @@
 
   --font-body: 'Space Grotesk', 'Noto Sans Devanagari', sans-serif;
   --font-deva: 'Noto Sans Devanagari', 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', 'DejaVu Sans Mono', monospace;
 
   --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
 }
@@ -582,6 +583,22 @@ a { color: var(--gold); }
   line-height: 1.5;
 }
 
+/* Code fields: monospace with a marked zero so 0 can never be read as O */
+.mono-code {
+  font-family: var(--font-mono) !important;
+  font-variant-numeric: slashed-zero;
+  font-feature-settings: "zero" 1, "ss19" 1;
+  letter-spacing: 0.06em;
+}
+.glyph-legend {
+  font-size: 0.74rem;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.5;
+  font-variant-numeric: slashed-zero;
+  font-feature-settings: "zero" 1, "ss19" 1;
+}
+
 .text-input {
   width: 100%;
   padding: 13px 16px;
@@ -787,7 +804,33 @@ a { color: var(--gold); }
 .result-body li { margin-bottom: 6px; }
 .result-body strong { color: var(--cream); }
 
-.result-done-btn { margin-top: 8px; }
+.result-body hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 14px 0;
+}
+.result-body code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: rgba(255,255,255,0.07);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.result-body .truncation-note {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(217,83,79,0.1);
+  border: 1px solid rgba(217,83,79,0.3);
+  color: #f8a09d;
+  font-size: 0.85rem;
+}
+
+.result-done-btn {
+  margin-top: 8px;
+  position: sticky;
+  bottom: 0;
+}
 
 /* ══════════════════════════════════════════════
    RESPONSIVE

@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Devanagari:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
 
@@ -37,11 +37,13 @@
       </p>
 
       <div class="dif-input-row" id="dif-boxes">
-        <input class="dif-box" type="text" maxlength="1" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
-        <input class="dif-box" type="text" maxlength="1" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
-        <input class="dif-box" type="text" maxlength="1" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
-        <input class="dif-box" type="text" maxlength="1" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
+        <input class="dif-box mono-code" type="text" maxlength="1" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
+        <input class="dif-box mono-code" type="text" maxlength="1" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
+        <input class="dif-box mono-code" type="text" maxlength="1" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
+        <input class="dif-box mono-code" type="text" maxlength="1" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
       </div>
+
+      <p class="glyph-legend" data-en="0 (slashed) is zero &nbsp;·&nbsp; O is the letter" data-hi="0 (कटा हुआ) शून्य है &nbsp;·&nbsp; O अक्षर है">0 (slashed) is zero &nbsp;·&nbsp; O is the letter</p>
 
       <p class="error-msg hidden" id="login-error"></p>
 
@@ -172,8 +174,9 @@
       <!-- Step 2: Quallis Hardware Code -->
       <div class="wizard-step hidden" id="step-2">
         <label class="field-label" data-en="Quallis Hardware Code" data-hi="Quallis हार्डवेयर कोड">Quallis Hardware Code</label>
-        <input class="text-input" id="input-quallis-code" type="text" placeholder="e.g. QLS-3A-K2-1F-G7-M4" autocomplete="off" autocapitalize="characters" spellcheck="false" />
+        <input class="text-input mono-code" id="input-quallis-code" type="text" placeholder="e.g. QLS-3A-K2-1F-G7-M4" autocomplete="off" autocapitalize="characters" spellcheck="false" />
         <p class="field-hint" data-en="Enter the 16-character code shown on your Quallis box LCD (format: QLS-XX-YY-TT-HH-CC)" data-hi="अपने Quallis बॉक्स की LCD पर दिखा 16-अक्षर कोड दर्ज करें (प्रारूप: QLS-XX-YY-TT-HH-CC)">Enter the 16-character code shown on your Quallis box LCD (format: QLS-XX-YY-TT-HH-CC)</p>
+        <p class="glyph-legend" data-en="Codes never contain the letters O or I — 0 (slashed) is zero and 1 is one" data-hi="कोड में O या I अक्षर कभी नहीं होते — 0 (कटा हुआ) शून्य और 1 एक है">Codes never contain the letters O or I — 0 (slashed) is zero and 1 is one</p>
         <div class="quallis-check-result hidden" id="quallis-result"></div>
 
         <!-- Sensor decode card (shown on successful decode) -->

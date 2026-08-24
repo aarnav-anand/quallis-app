@@ -70,6 +70,9 @@ const decoder = (() => {
       checksum   = fromBase34(CC);
     } catch (e) {
       if (e.message.startsWith("INVALID_CHAR")) {
+        const ch = e.message.split(":")[1] ?? "";
+        if (ch === "O") throw new Error("LETTER_O");
+        if (ch === "I") throw new Error("LETTER_I");
         throw new Error("INVALID_CHAR");
       }
       throw e;
@@ -101,14 +104,18 @@ const decoder = (() => {
         NOT_QUALLIS_CODE: "Not a valid Quallis code. Must start with QLS-",
         MALFORMED_CODE:   "Code format incorrect — check for missing characters.",
         CHECKSUM_FAIL:    "Code appears corrupted — please re-enter from the display.",
-        INVALID_CHAR:     "Invalid character detected — avoid using O or I.",
+        INVALID_CHAR:     "Invalid character detected — Quallis codes use only 0–9 and A–Z (without O and I).",
+        LETTER_O:         "You entered the letter O. Quallis codes never contain O — that character is a zero (0).",
+        LETTER_I:         "You entered the letter I. Quallis codes never contain I — that character is a one (1).",
         DEFAULT:          "Invalid Quallis code. Please check and try again.",
       },
       hi: {
         NOT_QUALLIS_CODE: "यह मान्य Quallis कोड नहीं है। QLS- से शुरू होना चाहिए।",
         MALFORMED_CODE:   "कोड का प्रारूप गलत है — कोई अक्षर छूट गया हो सकता है।",
         CHECKSUM_FAIL:    "कोड दूषित लग रहा है — कृपया डिस्प्ले से दोबारा दर्ज करें।",
-        INVALID_CHAR:     "अमान्य अक्षर — O या I का उपयोग न करें।",
+        INVALID_CHAR:     "अमान्य अक्षर — Quallis कोड में केवल 0–9 और A–Z (O और I को छोड़कर) होते हैं।",
+        LETTER_O:         "आपने अक्षर O दर्ज किया है। Quallis कोड में O कभी नहीं होता — वह शून्य (0) है।",
+        LETTER_I:         "आपने अक्षर I दर्ज किया है। Quallis कोड में I कभी नहीं होता — वह एक (1) है।",
         DEFAULT:          "अमान्य Quallis कोड। कृपया जांचें और पुनः प्रयास करें।",
       },
     };
