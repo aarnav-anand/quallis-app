@@ -795,8 +795,13 @@ a { color: var(--gold); }
 }
 .result-body li { margin-bottom: 6px; }
 .result-body strong { color: var(--cream); }
+.result-body hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 16px 0;
+}
 
-.result-done-btn { margin-top: 8px; }
+.result-done-btn { margin-top: 12px; }
 
 /* ══════════════════════════════════════════════
    RESPONSIVE

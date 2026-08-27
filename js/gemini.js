@@ -106,33 +106,87 @@ Based on the sensor data AND the visual appearance of the crop in the image, pro
 FORMATTING REQUIREMENT: Keep each point crisp, concise, and direct. Ensure all 7 sections are fully answered and concluded without truncation.`;
   }
 
-  /** Minimal markdown → HTML converter */
+  /** Robust markdown → HTML converter */
   function markdownToHtml(md) {
-    return md
-      // Headers
-      .replace(/^#### (.+)$/gm, "<h4>$1</h4>")
-      .replace(/^### (.+)$/gm, "<h3>$1</h3>")
-      .replace(/^## (.+)$/gm, "<h2>$1</h2>")
-      .replace(/^# (.+)$/gm, "<h2>$1</h2>")
-      // Bold
-      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-      // Italic
-      .replace(/\*(.+?)\*/g, "<em>$1</em>")
-      // Bullet list items
-      .replace(/^[-•] (.+)$/gm, "<li>$1</li>")
-      // Numbered list items
-      .replace(/^\d+\. (.+)$/gm, "<li>$1</li>")
-      // Wrap consecutive <li> in <ul>
-      .replace(/(<li>[\s\S]*?<\/li>)(\s*(?!<li>))/g, "<ul>$1</ul>$2")
-      // Paragraphs (double newline → <p>)
-      .replace(/\n{2,}/g, "</p><p>")
-      .replace(/^(.+)$/, "<p>$1</p>")
-      // Fix doubled paragraph wrapping around block elements
-      .replace(/<p>(<[hul])/g, "$1")
-      .replace(/(<\/[hul][^>]*>)<\/p>/g, "$1")
-      // Clean up extra whitespace-only paragraphs
-      .replace(/<p>\s*<\/p>/g, "")
-      .trim();
+    if (!md) return "";
+
+    // 1. Normalize line endings and clean up stray markers
+    let text = md.replace(/\r\n/g, "\n").trim();
+
+    // 2. Process line by line
+    const lines = text.split("\n");
+    let html = "";
+    let inList = false;
+
+    // Helper for inline bold, italic, code
+    const formatInline = (str) => {
+      return str
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        .replace(/__(.*?)__/g, "<strong>$1</strong>")
+        .replace(/(^|\s)\*(?!\s)(.*?)(?<!\s)\*($|\s)/g, "$1<em>$2</em>$3")
+        .replace(/`(.*?)`/g, "<code>$1</code>");
+    };
+
+    for (let i = 0; i < lines.length; i++) {
+      let line = lines[i];
+      let trimmed = line.trim();
+
+      if (!trimmed) {
+        if (inList) {
+          html += "</ul>";
+          inList = false;
+        }
+        continue;
+      }
+
+      // Horizontal rule
+      if (/^---+$|^===+$/.test(trimmed)) {
+        if (inList) { html += "</ul>"; inList = false; }
+        html += "<hr>";
+        continue;
+      }
+
+      // Markdown Headers (### or ## or #)
+      const headerMatch = trimmed.match(/^(#{1,4})\s+(.+)$/);
+      if (headerMatch) {
+        if (inList) { html += "</ul>"; inList = false; }
+        const level = Math.min(headerMatch[1].length + 1, 4);
+        html += `<h${level}>${formatInline(headerMatch[2])}</h${level}>`;
+        continue;
+      }
+
+      // Section Number Headers (e.g. "3. सेंसर डेटा की व्याख्या (Sensor Interpretation)")
+      const secNumMatch = trimmed.match(/^(\d+[\.\)]\s+[^\n:]+):?$/);
+      if (secNumMatch && !trimmed.includes("http")) {
+        if (inList) { html += "</ul>"; inList = false; }
+        html += `<h3>${formatInline(secNumMatch[1])}</h3>`;
+        continue;
+      }
+
+      // Bullet list items (* item or - item or • item)
+      const bulletMatch = trimmed.match(/^[\*\-•]\s+(.+)$/);
+      if (bulletMatch) {
+        if (!inList) {
+          html += "<ul>";
+          inList = true;
+        }
+        html += `<li>${formatInline(bulletMatch[1])}</li>`;
+        continue;
+      }
+
+      // Regular paragraph line
+      if (inList) {
+        html += "</ul>";
+        inList = false;
+      }
+      html += `<p>${formatInline(trimmed)}</p>`;
+    }
+
+    if (inList) {
+      html += "</ul>";
+    }
+
+    return html;
   }
 
   return { analyzeCrop };
