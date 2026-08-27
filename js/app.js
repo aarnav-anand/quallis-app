@@ -233,6 +233,16 @@
     });
   });
 
+  // Auto-convert letter O to 0 and letter I to 1 on typing for Quallis hardware code
+  inputQuallisCode.addEventListener("input", (e) => {
+    const val = e.target.value.toUpperCase();
+    if (val.startsWith("QLS-")) {
+      e.target.value = "QLS-" + val.slice(4).replace(/O/g, "0").replace(/I/g, "1");
+    } else {
+      e.target.value = val.replace(/O/g, "0").replace(/I/g, "1");
+    }
+  });
+
   async function handleNext() {
     clearError(modalError);
 

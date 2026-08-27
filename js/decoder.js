@@ -15,7 +15,8 @@ const decoder = (() => {
    */
   function fromBase34(str) {
     let result = 0;
-    for (const ch of str.toUpperCase()) {
+    const normalized = str.toUpperCase().replace(/O/g, "0").replace(/I/g, "1");
+    for (const ch of normalized) {
       const idx = ALPHABET.indexOf(ch);
       if (idx === -1) throw new Error(`INVALID_CHAR:${ch}`);
       result = result * 34 + idx;
@@ -38,7 +39,14 @@ const decoder = (() => {
    * @throws Error with a user-friendly message
    */
   function decodeQuallis(raw) {
-    const code = raw.trim().toUpperCase();
+    // 0. Auto-map O -> 0 and I -> 1 to handle visual ambiguity gracefully
+    let code = raw.trim().toUpperCase();
+    if (code.startsWith("QLS-")) {
+      const payload = code.slice(4).replace(/O/g, "0").replace(/I/g, "1");
+      code = "QLS-" + payload;
+    } else {
+      code = code.replace(/O/g, "0").replace(/I/g, "1");
+    }
 
     // 1. Validate prefix
     if (!code.startsWith("QLS-")) {

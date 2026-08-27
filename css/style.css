@@ -192,8 +192,12 @@ a { color: var(--gold); }
   appearance: textfield;
   outline: none;
 }
-/* text-transform so typed lowercase appears uppercase instantly */
-.dif-box { text-transform: uppercase; }
+/* text-transform so typed lowercase appears uppercase instantly; slashed-zero for clear O vs 0 distinction */
+.dif-box {
+  text-transform: uppercase;
+  font-variant-numeric: slashed-zero;
+  font-feature-settings: "zero";
+}
 .dif-box:focus {
   border-color: var(--field);
   box-shadow: 0 0 0 3px rgba(61,122,58,0.25);
@@ -592,6 +596,8 @@ a { color: var(--gold); }
   font-family: var(--font-body);
   font-size: 1rem;
   outline: none;
+  font-variant-numeric: slashed-zero;
+  font-feature-settings: "zero";
   transition: border-color var(--transition), box-shadow var(--transition);
 }
 .text-input::placeholder { color: var(--muted); }
@@ -771,6 +777,9 @@ a { color: var(--gold); }
   font-size: 0.92rem;
   line-height: 1.75;
   color: var(--cream);
+  padding-bottom: 20px;
+  font-variant-numeric: slashed-zero;
+  font-feature-settings: "zero";
 }
 .result-body h2, .result-body h3, .result-body h4 {
   color: var(--gold);

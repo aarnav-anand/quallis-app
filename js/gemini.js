@@ -44,7 +44,7 @@ const gemini = (() => {
       ],
       generationConfig: {
         temperature: 0.4,
-        maxOutputTokens: 2048,
+        maxOutputTokens: 8192,
       },
     };
 
@@ -103,7 +103,7 @@ Based on the sensor data AND the visual appearance of the crop in the image, pro
 6. **Recommended Actions** — 3–5 specific, actionable steps the farmer should take immediately regarding storage, treatment, or sale.
 7. **Preventive Measures for Next Harvest** — 2–3 steps to improve post-harvest quality in the future.
 
-Ensure all markdown headers and bullet points are cleanly formatted in the requested language (${isHindi ? "Hindi" : "English"}).`;
+FORMATTING REQUIREMENT: Keep each point crisp, concise, and direct. Ensure all 7 sections are fully answered and concluded without truncation.`;
   }
 
   /** Minimal markdown → HTML converter */
