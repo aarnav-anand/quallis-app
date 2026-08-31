@@ -31,10 +31,10 @@ const i18n = (() => {
 
       // Sensor card
       sensorDecoded: "Sensor Readings Decoded",
-      ethanol: "Ethanol",
-      methane: "Methane",
+      vocLevel: "VOC Level",
       temperature: "Temperature",
       humidity: "Humidity",
+      colorResponse: "Color Response",
 
       // Results
       analyzing: "Analyzing post-harvest quality…",
@@ -69,10 +69,10 @@ const i18n = (() => {
 
       // Sensor card
       sensorDecoded: "सेंसर रीडिंग डिकोड हुई",
-      ethanol: "इथेनॉल",
-      methane: "मीथेन",
+      vocLevel: "VOC स्तर",
       temperature: "तापमान",
       humidity: "आर्द्रता",
+      colorResponse: "रंग प्रतिक्रिया",
 
       // Results
       analyzing: "फसल की गुणवत्ता का विश्लेषण हो रहा है…",

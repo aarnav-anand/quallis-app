@@ -1,7 +1,7 @@
 // ══════════════════════════════════════════════
 //  Quallis — Gemini Vision API
 //  Sends post-harvest crop image + decoded sensor
-//  data and returns quality analysis in the requested language.
+//  data (BME280, MQ138, TCS34725) and returns quality analysis.
 // ══════════════════════════════════════════════
 
 const gemini = (() => {
@@ -11,7 +11,7 @@ const gemini = (() => {
    * Analyse a post-harvest crop image.
    * @param {string} cropName       - e.g. "Wheat"
    * @param {object} sensorData     - decoded sensor object from decoder.js
-   *   { ethanol_ppm, methane_ppm, temperature_c, humidity_pct }
+   *   { voc_level, temperature_c, humidity_pct, color_value }
    * @param {string} base64Image    - base64-encoded image data (without prefix)
    * @param {string} mimeType       - e.g. "image/jpeg"
    * @param {string} lang           - "en" | "hi"
@@ -21,8 +21,8 @@ const gemini = (() => {
     if (!CONFIG.GEMINI_API_KEY || CONFIG.GEMINI_API_KEY.includes("YOUR_GEMINI_API_KEY")) {
       console.warn("Gemini API key missing in js/config.js. Returning simulated analysis.");
       const demoHtml = lang === "hi"
-        ? `<h3>${cropName} की गुणवत्ता रिपोर्ट (डेमो मोड)</h3><p><strong>कुल ग्रेड:</strong> B — स्वीकार्य</p><p><strong>नोट:</strong> लाइव AI विश्लेषण के लिए <code>js/config.js</code> में <code>GEMINI_API_KEY</code> सेट करें।</p><ul><li>इथेनॉल स्तर स्वीकार्य सीमा में है।</li><li>शेल्फ लाइफ बढ़ाने के लिए 15°C से नीचे ठंडी, सूखी जगह पर रखें।</li></ul>`
-        : `<h3>Quality Report for ${cropName} (Demo Mode)</h3><p><strong>Overall Grade:</strong> B — Acceptable</p><p><strong>Note:</strong> Set <code>GEMINI_API_KEY</code> in <code>js/config.js</code> for live AI analysis.</p><ul><li>Ethanol levels within acceptable post-harvest range.</li><li>Store in a cool, dry location below 15°C to extend shelf life.</li></ul>`;
+        ? `<h3>${cropName} - फसल विश्लेषण (डेमो मोड)</h3><p><strong>स्पॉइलेज जोखिम (Spoilage Risk):</strong> LOW SPOILAGE RISK</p><p><strong>नोट:</strong> लाइव AI विश्लेषण के लिए <code>js/config.js</code> में <code>GEMINI_API_KEY</code> सेट करें।</p><h4>सेंसर डेटा</h4><ul><li>तापमान: ${sensorData?.temperature_c ?? 28.4} °C</li><li>आर्द्रता: ${sensorData?.humidity_pct ?? 64.2} %</li><li>VOC स्तर: ${sensorData?.voc_level ?? 245}</li><li>रंग प्रतिक्रिया: ${sensorData?.color_value ?? 520}</li></ul>`
+        : `<h3>${cropName} - CROP ANALYSIS (Demo Mode)</h3><p><strong>Spoilage Risk:</strong> LOW SPOILAGE RISK</p><p><strong>Note:</strong> Set <code>GEMINI_API_KEY</code> in <code>js/config.js</code> for live AI analysis.</p><h4>SENSOR DATA</h4><ul><li>Temperature: ${sensorData?.temperature_c ?? 28.4} °C</li><li>Humidity: ${sensorData?.humidity_pct ?? 64.2} %</li><li>VOC Level: ${sensorData?.voc_level ?? 245}</li><li>Color Response: ${sensorData?.color_value ?? 520}</li></ul>`;
       return { html: demoHtml };
     }
 
@@ -70,11 +70,11 @@ const gemini = (() => {
 
   /** Build the structured post-harvest quality assessment prompt in the target language */
   function buildPrompt(cropName, sensorData, lang) {
-    const { ethanol_ppm, methane_ppm, temperature_c, humidity_pct } = sensorData;
+    const { voc_level, temperature_c, humidity_pct, color_value } = sensorData;
     const isHindi = lang === "hi";
 
     const langInstruction = isHindi
-      ? "CRITICAL REQUIREMENT: You MUST write your ENTIRE response in HINDI using Devanagari script (देवनागरी). All section titles, descriptions, recommendations, and analysis must be in clear, culturally appropriate Hindi for Indian farmers."
+      ? "CRITICAL REQUIREMENT: You MUST write your ENTIRE response in HINDI using Devanagari script (देवनागरी). All headings, descriptions, analyses, and recommendations must be in clear, culturally appropriate Hindi for Indian farmers."
       : "CRITICAL REQUIREMENT: You MUST write your ENTIRE response in ENGLISH.";
 
     return `You are Quallis, an expert post-harvest crop quality AI assistant serving farmers and agri-businesses in India.
@@ -86,24 +86,48 @@ A farmer has submitted the following post-harvest crop sample for quality assess
 **Crop:** ${cropName}
 
 **Sensor Readings (from Quallis hardware box):**
-- Ethanol (MQ3): ${ethanol_ppm} ppm  — indicator of fermentation / spoilage onset
-- Methane (MQ4): ${methane_ppm} ppm  — indicator of anaerobic decomposition
-- Temperature:   ${temperature_c} °C — storage/ambient temperature at time of scan
-- Humidity:      ${humidity_pct} %   — relative humidity at time of scan
+- Temperature (BME280): ${temperature_c} °C
+- Humidity (BME280): ${humidity_pct} %
+- VOC Level (MQ138 broad-response gas/VOC sensor): ${voc_level}
+- Color Response (TCS34725 color sensor index): ${color_value}
 
 **Uploaded Image:** (see attached crop photo)
 
-Based on the sensor data AND the visual appearance of the crop in the image, provide a comprehensive post-harvest quality report covering:
+CRITICAL SENSOR & ASSESSMENT CONSTRAINTS:
+1. The MQ138 is a broad-response gas/VOC sensor. Its reading MUST NOT be interpreted as a specific methane, acetone, ethanol, or other gas concentration. Do NOT identify a specific gas from the MQ138 reading alone.
+2. Sensor readings are supporting evidence and should NOT be treated as definitive proof of spoilage.
+3. Clearly distinguish between VISUAL OBSERVATION (what you see in the crop photo) and SENSOR OBSERVATION (sensor readings). Do NOT claim that an image proves a particular gas is present.
+4. Categorize overall spoilage risk strictly into one of these 4 categories:
+   - LOW SPOILAGE RISK
+   - MODERATE SPOILAGE RISK
+   - HIGH SPOILAGE RISK
+   - REQUIRES INSPECTION
 
-1. **Overall Quality Grade** — Grade A (Excellent) / B (Good) / C (Acceptable) / D (Poor) / F (Reject). Justify clearly.
-2. **Visual Assessment** — Describe what you see: colour, texture, signs of mould, shrivelling, bruising, insect damage, moisture damage, or discolouration.
-3. **Sensor Interpretation** — Interpret the ethanol and methane readings in the context of this crop. Are they within safe limits? Do they indicate early fermentation, spoilage, or anaerobic rot?
-4. **Storage Suitability** — Is this batch suitable for short-term storage, long-term storage, or should it be sold/processed immediately?
-5. **Market Grading Advice** — What market grade (AGMARK or equivalent) does this batch likely qualify for? Should it be separated or blended?
-6. **Recommended Actions** — 3–5 specific, actionable steps the farmer should take immediately regarding storage, treatment, or sale.
-7. **Preventive Measures for Next Harvest** — 2–3 steps to improve post-harvest quality in the future.
+Provide your report structured cleanly with these exact sections:
 
-FORMATTING REQUIREMENT: Keep each point crisp, concise, and direct. Ensure all 7 sections are fully answered and concluded without truncation.`;
+### CROP ANALYSIS
+- Crop: ${cropName}
+
+### SENSOR DATA
+- Temperature: ${temperature_c} °C
+- Humidity: ${humidity_pct} %
+- VOC Level: ${voc_level}
+- Color Response: ${color_value}
+
+### VISUAL ANALYSIS
+[Your detailed visual assessment of the uploaded crop image: colour, texture, signs of mould, shrivelling, bruising, moisture damage, or discolouration]
+
+### SENSOR ANALYSIS
+[Interpretation of temperature, humidity, VOC level, and color response in the context of this specific crop, observing all constraints]
+
+### OVERALL ASSESSMENT
+- Spoilage Risk: [LOW SPOILAGE RISK / MODERATE SPOILAGE RISK / HIGH SPOILAGE RISK / REQUIRES INSPECTION]
+[Detailed explanation of the risk reasoning]
+
+### RECOMMENDATION
+[Specific, actionable steps the farmer should take immediately regarding storage, treatment, sale, or drying]
+
+FORMATTING REQUIREMENT: Keep each point crisp, concise, and direct. Ensure all sections are fully answered and concluded without truncation.`;
   }
 
   /** Robust markdown → HTML converter */
@@ -152,14 +176,6 @@ FORMATTING REQUIREMENT: Keep each point crisp, concise, and direct. Ensure all 7
         if (inList) { html += "</ul>"; inList = false; }
         const level = Math.min(headerMatch[1].length + 1, 4);
         html += `<h${level}>${formatInline(headerMatch[2])}</h${level}>`;
-        continue;
-      }
-
-      // Section Number Headers (e.g. "3. सेंसर डेटा की व्याख्या (Sensor Interpretation)")
-      const secNumMatch = trimmed.match(/^(\d+[\.\)]\s+[^\n:]+):?$/);
-      if (secNumMatch && !trimmed.includes("http")) {
-        if (inList) { html += "</ul>"; inList = false; }
-        html += `<h3>${formatInline(secNumMatch[1])}</h3>`;
         continue;
       }
 

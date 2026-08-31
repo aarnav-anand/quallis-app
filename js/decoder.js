@@ -1,7 +1,7 @@
 // ══════════════════════════════════════════════
 //  Quallis — Hardware Code Decoder
-//  Decodes the QLS-XX-YY-TT-HH-CC code emitted
-//  by the Quallis hardware box (ESP32 + sensors).
+//  Decodes the QLS-MQ-BT-BH-TC-CC code emitted
+//  by the Quallis hardware box (ESP32 + BME280 + MQ138 + TCS34725).
 //  Pure math — no server call needed.
 // ══════════════════════════════════════════════
 
@@ -27,15 +27,15 @@ const decoder = (() => {
   /**
    * Decode a Quallis hardware code.
    *
-   * Expected format: QLS-XX-YY-TT-HH-CC
-   *   XX — MQ3 ethanol   (0–500 ppm)
-   *   YY — MQ4 methane   (0–10 000 ppm)
-   *   TT — Temperature   (0–50 °C)
-   *   HH — Humidity      (0–100 %)
-   *   CC — Checksum
+   * Expected format: QLS-MQ-BT-BH-TC-CC
+   *   MQ — MQ138 VOC/gas response   (0–1155)
+   *   BT — BME280 temperature       (0–1155) -> decoded: (tempCode / 1155) * 60 - 10 (°C)
+   *   BH — BME280 humidity          (0–1155) -> decoded: (humCode / 1155) * 100 (%)
+   *   TC — TCS34725 color response  (0–1155)
+   *   CC — Checksum                 (mqCode ^ tempCode ^ humCode ^ colorCode) % 1156
    *
    * @param {string} raw — code string as typed by user
-   * @returns {{ ethanol_ppm: number, methane_ppm: number, temperature_c: number, humidity_pct: number }}
+   * @returns {{ voc_level: number, temperature_c: number, humidity_pct: number, color_value: number }}
    * @throws Error with a user-friendly message
    */
   function decodeQuallis(raw) {
@@ -53,29 +53,29 @@ const decoder = (() => {
       throw new Error("NOT_QUALLIS_CODE");
     }
 
-    // 2. Split and validate segment count
+    // 2. Split and validate segment count (6 parts: QLS, MQ, BT, BH, TC, CC)
     const parts = code.split("-");
     if (parts.length !== 6) {
       throw new Error("MALFORMED_CODE");
     }
 
-    const [, XX, YY, TT, HH, CC] = parts;
+    const [, MQ, BT, BH, TC, CC] = parts;
 
     // 3. Validate all segments are exactly 2 chars
-    for (const [name, seg] of [["XX", XX], ["YY", YY], ["TT", TT], ["HH", HH], ["CC", CC]]) {
+    for (const [name, seg] of [["MQ", MQ], ["BT", BT], ["BH", BH], ["TC", TC], ["CC", CC]]) {
       if (!seg || seg.length !== 2) {
         throw new Error("MALFORMED_CODE");
       }
     }
 
     // 4. Decode each segment (will throw INVALID_CHAR if bad character)
-    let mq3Scaled, mq4Scaled, tempScaled, humScaled, checksum;
+    let mqCode, tempCode, humCode, colorCode, checksum;
     try {
-      mq3Scaled  = fromBase34(XX);
-      mq4Scaled  = fromBase34(YY);
-      tempScaled = fromBase34(TT);
-      humScaled  = fromBase34(HH);
-      checksum   = fromBase34(CC);
+      mqCode    = fromBase34(MQ);
+      tempCode  = fromBase34(BT);
+      humCode   = fromBase34(BH);
+      colorCode = fromBase34(TC);
+      checksum  = fromBase34(CC);
     } catch (e) {
       if (e.message.startsWith("INVALID_CHAR")) {
         throw new Error("INVALID_CHAR");
@@ -83,18 +83,25 @@ const decoder = (() => {
       throw e;
     }
 
-    // 5. Validate checksum
-    const expected = (mq3Scaled ^ mq4Scaled ^ tempScaled ^ humScaled) % 1156;
+    // 5. Recalculate and validate checksum
+    const expected = (mqCode ^ tempCode ^ humCode ^ colorCode) % 1156;
     if (checksum !== expected) {
       throw new Error("CHECKSUM_FAIL");
     }
 
-    // 6. Reverse-scale to physical values
+    // 6. Decode values according to exact hardware formulas
+    // Temperature: (tempCode / 1155) * 60 - 10 (°C)
+    // Humidity:    (humCode / 1155) * 100 (%)
+    const temperature_c = +((tempCode / 1155) * 60 - 10).toFixed(1);
+    const humidity_pct  = +((humCode / 1155) * 100).toFixed(1);
+    const voc_level     = mqCode;
+    const color_value   = colorCode;
+
     return {
-      ethanol_ppm:   +(mq3Scaled  / 1155 * 500).toFixed(2),
-      methane_ppm:   +(mq4Scaled  / 1155 * 10000).toFixed(2),
-      temperature_c: +(tempScaled / 1155 * 50).toFixed(2),
-      humidity_pct:  +(humScaled  / 1155 * 100).toFixed(2),
+      voc_level,
+      temperature_c,
+      humidity_pct,
+      color_value,
     };
   }
 
@@ -107,14 +114,14 @@ const decoder = (() => {
     const messages = {
       en: {
         NOT_QUALLIS_CODE: "Not a valid Quallis code. Must start with QLS-",
-        MALFORMED_CODE:   "Code format incorrect — check for missing characters.",
+        MALFORMED_CODE:   "Code format incorrect — format should be QLS-MQ-BT-BH-TC-CC",
         CHECKSUM_FAIL:    "Code appears corrupted — please re-enter from the display.",
         INVALID_CHAR:     "Invalid character detected — avoid using O or I.",
         DEFAULT:          "Invalid Quallis code. Please check and try again.",
       },
       hi: {
         NOT_QUALLIS_CODE: "यह मान्य Quallis कोड नहीं है। QLS- से शुरू होना चाहिए।",
-        MALFORMED_CODE:   "कोड का प्रारूप गलत है — कोई अक्षर छूट गया हो सकता है।",
+        MALFORMED_CODE:   "कोड का प्रारूप गलत है — प्रारूप QLS-MQ-BT-BH-TC-CC होना चाहिए।",
         CHECKSUM_FAIL:    "कोड दूषित लग रहा है — कृपया डिस्प्ले से दोबारा दर्ज करें।",
         INVALID_CHAR:     "अमान्य अक्षर — O या I का उपयोग न करें।",
         DEFAULT:          "अमान्य Quallis कोड। कृपया जांचें और पुनः प्रयास करें।",

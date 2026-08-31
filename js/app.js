@@ -9,7 +9,7 @@
     quallis: 0,        // live scan credit count
     wizardStep: 1,     // 1 | 2 | 3
     cropName: "",
-    sensorData: null,  // decoded sensor object { ethanol_ppm, methane_ppm, temperature_c, humidity_pct }
+    sensorData: null,  // decoded sensor object { voc_level, temperature_c, humidity_pct, color_value }
     imageBase64: "",
     imageMime: "",
   };
@@ -327,10 +327,10 @@
   // ── Sensor Card ───────────────────────────────
   function showSensorCard(data) {
     if (!sensorCard) return;
-    $("sc-ethanol").textContent = data.ethanol_ppm;
-    $("sc-methane").textContent = data.methane_ppm;
+    $("sc-voc").textContent = data.voc_level;
     $("sc-temp").textContent = data.temperature_c;
     $("sc-humidity").textContent = data.humidity_pct;
+    $("sc-color").textContent = data.color_value;
     sensorCard.classList.remove("hidden");
   }
 

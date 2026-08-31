@@ -172,8 +172,8 @@
       <!-- Step 2: Quallis Hardware Code -->
       <div class="wizard-step hidden" id="step-2">
         <label class="field-label" data-en="Quallis Hardware Code" data-hi="Quallis हार्डवेयर कोड">Quallis Hardware Code</label>
-        <input class="text-input" id="input-quallis-code" type="text" placeholder="e.g. QLS-3A-K2-1F-G7-M4" autocomplete="off" autocapitalize="characters" spellcheck="false" />
-        <p class="field-hint" data-en="Enter the 16-character code shown on your Quallis box LCD (format: QLS-XX-YY-TT-HH-CC)" data-hi="अपने Quallis बॉक्स की LCD पर दिखा 16-अक्षर कोड दर्ज करें (प्रारूप: QLS-XX-YY-TT-HH-CC)">Enter the 16-character code shown on your Quallis box LCD (format: QLS-XX-YY-TT-HH-CC)</p>
+        <input class="text-input" id="input-quallis-code" type="text" placeholder="e.g. QLS-A3-K7-F2-8M-N7" autocomplete="off" autocapitalize="characters" spellcheck="false" />
+        <p class="field-hint" data-en="Enter the 16-character code shown on your Quallis box LCD (format: QLS-MQ-BT-BH-TC-CC)" data-hi="अपने Quallis बॉक्स की LCD पर दिखा 16-अक्षर कोड दर्ज करें (प्रारूप: QLS-MQ-BT-BH-TC-CC)">Enter the 16-character code shown on your Quallis box LCD (format: QLS-MQ-BT-BH-TC-CC)</p>
         <div class="quallis-check-result hidden" id="quallis-result"></div>
 
         <!-- Sensor decode card (shown on successful decode) -->
@@ -181,12 +181,8 @@
           <div class="sensor-card-title" data-en="Sensor Readings Decoded ✓" data-hi="सेंसर रीडिंग डिकोड हुई ✓">Sensor Readings Decoded ✓</div>
           <div class="sensor-grid">
             <div class="sensor-item">
-              <div class="sensor-label" data-en="Ethanol (MQ3)" data-hi="इथेनॉल (MQ3)">Ethanol (MQ3)</div>
-              <div class="sensor-value"><span id="sc-ethanol">–</span><span class="sensor-unit">ppm</span></div>
-            </div>
-            <div class="sensor-item">
-              <div class="sensor-label" data-en="Methane (MQ4)" data-hi="मीथेन (MQ4)">Methane (MQ4)</div>
-              <div class="sensor-value"><span id="sc-methane">–</span><span class="sensor-unit">ppm</span></div>
+              <div class="sensor-label" data-en="VOC Level" data-hi="VOC स्तर">VOC Level</div>
+              <div class="sensor-value"><span id="sc-voc">–</span></div>
             </div>
             <div class="sensor-item">
               <div class="sensor-label" data-en="Temperature" data-hi="तापमान">Temperature</div>
@@ -195,6 +191,10 @@
             <div class="sensor-item">
               <div class="sensor-label" data-en="Humidity" data-hi="आर्द्रता">Humidity</div>
               <div class="sensor-value"><span id="sc-humidity">–</span><span class="sensor-unit">%</span></div>
+            </div>
+            <div class="sensor-item">
+              <div class="sensor-label" data-en="Color Response" data-hi="रंग प्रतिक्रिया">Color Response</div>
+              <div class="sensor-value"><span id="sc-color">–</span></div>
             </div>
           </div>
         </div>
